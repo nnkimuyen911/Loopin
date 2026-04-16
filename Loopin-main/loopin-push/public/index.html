@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loopin Push Notifications</title>
+  <style>
+    :root {
+      --bg: #f8f6fb;
+      --card: #ffffff;
+      --text: #374151;
+      --muted: #6b7280;
+      --accent: #d977fa;
+      --accent-2: #fb7185;
+      --success: #059669;
+      --danger: #b91c1c;
+      --shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top right, #fce7f3 0%, #f8f6fb 35%, #eef2ff 100%);
+      color: var(--text);
+      padding: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .app {
+      width: min(760px, 100%);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(90deg, #fb7185, #d977fa);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 6px 16px rgba(217, 119, 250, 0.25);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: #111827;
+      box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2);
+    }
+
+    button.ghost {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 0.95rem;
+      color: var(--muted);
+      min-height: 44px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .status.success {
+      color: var(--success);
+      border-color: rgba(5, 150, 105, 0.25);
+      background: #ecfdf5;
+    }
+
+    .status.error {
+      color: var(--danger);
+      border-color: rgba(185, 28, 28, 0.2);
+      background: #fef2f2;
+    }
+
+    .tips {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .tips code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Loopin Web Push Demo</h1>
+    <p>
+      Enable desktop notifications for your habits. Once subscribed, reminders will be sent every 30 seconds,
+      and you can manually trigger test notifications too.
+    </p>
+
+    <div class="controls">
+      <button id="enableBtn">Enable Notification</button>
+      <button id="subscribeBtn" class="secondary" disabled>Subscribe</button>
+      <button id="sendReminderBtn" class="ghost" disabled>Send "Loopin Reminder"</button>
+      <button id="sendWarningBtn" class="ghost" disabled>Send "Streak Warning"</button>
+    </div>
+
+    <div id="status" class="status">Ready. Click "Enable Notification" first.</div>
+
+    <div class="tips">
+      <strong>Tip:</strong> Keep this page open after subscribing to receive simulated scheduled reminders every
+      <code>30s</code>.
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopin - Find Friends</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%); min-height: 100vh; padding: 20px; }
+        
+        :root { 
+            --pastel-green: #A8E6CF; --pastel-green-dark: #7DC4A5; 
+            --pastel-blue: #A8D8EA; --pastel-blue-dark: #7BB8CC; 
+            --pastel-purple: #DDA0DD; --white: #FFFFFF; 
+            --soft-gray: #F5F5F5; --text-dark: #4A4A4A; --text-light: #7A7A7A; 
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* Navbar & Nav Menu */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: var(--white); border-radius: 20px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .nav-menu { display: flex; gap: 15px; margin-bottom: 30px; }
+        .nav-item { flex: 1; background: var(--white); padding: 15px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; color: var(--text-dark); box-shadow: 0 5px 20px rgba(0,0,0,0.05); transition: 0.3s; border: 2px solid transparent; }
+        .nav-item.active { border-color: var(--pastel-purple); background: #faf5ff; }
+
+        /* Sections */
+        .search-section { background: var(--white); border-radius: 30px; padding: 35px; margin-bottom: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 3px solid var(--pastel-purple); }
+        .search-input { width: 100%; padding: 16px 22px; border: 3px solid var(--soft-gray); border-radius: 18px; font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 600; outline: none; transition: 0.3s; }
+        .search-input:focus { border-color: var(--pastel-purple); background: #fff; }
+
+        /* Results List */
+        .results-grid { display: grid; gap: 15px; margin-top: 25px; }
+        .user-card { background: #fff; padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.04); border-left: 5px solid var(--pastel-purple); animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-pic { width: 45px; height: 45px; background: var(--pastel-purple); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; overflow: hidden; flex-shrink: 0; line-height: 1; }
+        .user-pic img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .btn-add { background: var(--pastel-purple); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-add:hover { filter: brightness(0.9); transform: scale(1.05); }
+
+/* Streak Badge Styling */
+.streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.user-card {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background: var(--white);
+    padding: 15px 20px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Tier 1: Small Ember (0-2 days) */
+.streak-ember { 
+    background: #fff5f5; 
+    color: #ff8787; 
+    border: 1.5px solid #ffc9c9;
+}
+
+/* Tier 2: Steady Flame (3-6 days) */
+.streak-blaze { 
+    background: var(--pastel-yellow); 
+    color: #f59f00; 
+    border: 1.5px solid #f0d78a;
+    box-shadow: 0 4px 12px rgba(255, 234, 167, 0.4);
+}
+
+/* Tier 3: Blue-Hot Intensity (7+ days) */
+.streak-supernova { 
+    background: #e7f5ff; 
+    color: #228be6; 
+    border: 1.5px solid #a8d8ea;
+    box-shadow: 0 0 15px rgba(168, 216, 234, 0.6);
+    animation: fire-pulse 1.5s infinite alternate;
+}
+
+@keyframes fire-pulse {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.05); filter: brightness(1.1); }
+}
+
+.streak-emoji { font-size: 1.2rem; }
+.btn-poke:hover {
+    background-color: var(--pastel-blue-dark) !important;
+    transform: scale(1.1);
+}
+
+.btn-poke:active {
+    transform: scale(0.9);
+}
+
+.streak-badge {
+    padding: 6px 10px;
+    min-width: 45px;
+    justify-content: center;
+}
+
+/* Shared structural base for badges and buttons */
+.streak-badge, .btn-poke {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px; /* Matching padding */
+    border-radius: 20px; /* Matching rounded corners */
+    font-weight: 800;
+    font-size: 0.9rem;
+    height: 36px; /* Uniform height */
+    border: 1.5px solid transparent; /* Prevents layout jump on hover */
+    transition: all 0.3s ease;
+}
+
+/* Poke Button Styling */
+.btn-poke {
+    background: var(--pastel-blue);
+    color: white;
+    cursor: pointer;
+    border: none;
+    min-width: 45px;
+}
+
+.btn-poke:hover {
+    background: var(--pastel-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(168, 216, 234, 0.4);
+}
+
+.btn-poke:active {
+    transform: translateY(0);
+}
+
+/* Ensure Streak Badge doesn't have a hover lift (since it's info, not an action) */
+.streak-badge {
+    cursor: default;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--white);
+    color: var(--text-dark);
+    padding: 14px 18px;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    border-left: 4px solid var(--pastel-green);
+    display: none;
+    z-index: 1000;
+    font-weight: 700;
+}
+
+.toast.show {
+    display: block;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <h2 style="font-weight: 800; color: var(--text-dark);">Loopin Social</h2>
+            <a href="/home" style="text-decoration: none; color: var(--text-light); font-weight: 700;">Back to Dashboard</a>
+        </nav>
+
+        <div class="nav-menu">
+            <a href="/home" class="nav-item">🏠 Home</a>
+            <a href="/ranking" class="nav-item">🏆 Ranking</a>
+            <a href="/friends" class="nav-item active">👥 Friends</a>
+        </div>
+
+        <section id="incomingRequestsSection" class="search-section" style="border-color: var(--pastel-blue); display: none;">
+            <h2 style="margin-bottom: 15px; color: var(--text-dark);">💌 Friend Requests</h2>
+            <div id="requestsList" class="results-grid"></div>
+        </section>
+
+        <section class="search-section">
+            <h2 style="margin-bottom: 15px; color: var(--text-dark);">🔍 Find Loopers</h2>
+            <input type="text" id="searchInput" class="search-input" placeholder="Enter username...">
+            <div id="resultsGrid" class="results-grid">
+                <div class="empty-msg">Type a name to start searching!</div>
+            </div>
+        </section>
+
+        <section class="search-section" style="border-color: var(--pastel-green);">
+            <h2 style="margin-bottom: 15px; color: var(--text-dark);">🌱 My Friends</h2>
+            <div id="friendsList" class="results-grid">
+                <div class="empty-msg">Loading friends...</div>
+            </div>
+        </section>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let sentRequestIds = [];
+        const token = localStorage.getItem('token') || localStorage.getItem('loopin_token');
+        if (!token) window.location.href = '/login';
+
+        function avatarInnerHtml(avatar, username) {
+            const letter = (username && username[0]) ? username[0].toUpperCase() : '?';
+            if (avatar == null || String(avatar).trim() === '') return letter;
+            const a = String(avatar).trim();
+            if (/^https?:\/\//i.test(a) || a.startsWith('/uploads/')) {
+                const safe = a.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                return `<img src="${safe}" alt="">`;
+            }
+            return a;
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const friendsList = document.getElementById('friendsList');
+        const requestsList = document.getElementById('requestsList');
+        const incomingRequestsSection = document.getElementById('incomingRequestsSection');
+
+        // --- 1. SEARCH LOGIC ---
+        let timeout = null;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeout);
+            const query = e.target.value;
+            if (query.length < 1) {
+                resultsGrid.innerHTML = '<div class="empty-msg">Type a name to start searching!</div>';
+                return;
+            }
+            timeout = setTimeout(() => searchUsers(query), 300);
+        });
+
+        async function searchUsers(query, existingFriendIds = null) {
+            try {
+                let friendIds = existingFriendIds;
+                if (!friendIds) {
+                    const resFriends = await fetch('/api/friendships/list', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    const friendData = await resFriends.json();
+                    friendIds = friendData.success ? friendData.data.map(f => f._id) : [];
+                }
+
+                const res = await fetch(`/api/friendships/search?username=${query}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await res.json();
+                if (result.success) renderSearchResults(result.data, friendIds);
+            } catch (err) {
+                console.error("Search failed", err);
+            }
+        }
+
+        function renderSearchResults(users) {
+    if (users.length === 0) {
+        resultsGrid.innerHTML = '<div class="empty-msg">No users found. 😕</div>';
+        return;
+    }
+
+    resultsGrid.innerHTML = users.map(user => {
+        let buttonHtml = '';
+        
+        // CHECK LOCAL ARRAY FIRST: If we just sent a request, show "Request Sent"
+        const localPending = sentRequestIds.includes(user._id);
+
+        if (user.friendshipStatus === 'accepted') {
+            buttonHtml = `<button class="btn-friended" disabled style="background: #e0e0e0; color: #888; cursor: not-allowed; border:none; padding:10px 20px; border-radius:12px; font-weight:700;">Friends 🌱</button>`;
+        } else if (user.friendshipStatus === 'pending' || localPending) {
+            // If the database says pending OR our local array has the ID
+            if (user.isRequester || localPending) {
+                // NEW: Show Cancel button instead of just a disabled "Request Sent" tag
+                buttonHtml = `
+                    <button class="btn-cancel" onclick="cancelRequest('${user._id}')" 
+                        style="background: var(--pastel-yellow); color: #8B7355; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700;">
+                        Cancel Request
+                    </button>`;
+            } else {
+                buttonHtml = `<button class="btn-add" onclick="handleRequest('${user._id}', 'accept')">Accept Request</button>`;
+            }
+        } else {
+            buttonHtml = `<button class="btn-add" onclick="addFriend('${user._id}')">Add Friend</button>`;
+        }
+
+        return `
+            <div class="user-card">
+                <div class="user-info">
+                    <div class="user-pic">${avatarInnerHtml(user.avatar, user.username)}</div>
+                    <span style="font-weight: 700;">${user.username}</span>
+                </div>
+                ${buttonHtml}
+            </div>
+        `;
+    }).join('');
+}
+  // --- 2. FRIEND REQUESTS ---
+async function addFriend(recipientId) {
+    try {
+        const res = await fetch(`/api/friendships/request/${recipientId}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+            sentRequestIds.push(recipientId);
+            const query = searchInput.value;
+            if (query) searchUsers(query); 
+        } else {
+            alert(result.message);
+        }
+    } catch (err) {
+        console.error("Failed to send request", err);
+    }
+}
+        async function loadFriendRequests() {
+            try {
+                const res = await fetch('/api/friendships/my-requests', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await res.json();
+
+                if (result.success && result.requests.length > 0) {
+                    incomingRequestsSection.style.display = 'block';
+                    requestsList.innerHTML = result.requests.map(req => `
+                        <div class="user-card" style="border-left-color: var(--pastel-blue)">
+                            <div class="user-info">
+                                <div class="user-pic" style="background: var(--pastel-blue)">${avatarInnerHtml(req.sender.avatar, req.sender.username)}</div>
+                                <span><b>${req.sender.username}</b> wants to be friends!</span>
+                            </div>
+                            <div>
+                                <button class="btn-add" onclick="handleRequest('${req.sender._id}', 'accept')">Accept</button>
+                                <button onclick="handleRequest('${req.sender._id}', 'reject')" style="background:none; border:none; cursor:pointer; font-size: 20px; margin-left:10px;">❌</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    incomingRequestsSection.style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Load requests failed", err);
+            }
+        }
+
+        async function handleRequest(senderId, action) {
+            try {
+                const res = await fetch('/api/friendships/handle-request', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token 
+                    },
+                    body: JSON.stringify({ senderId, action })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    loadFriendRequests(); 
+                    loadFriends();
+                }
+            } catch (err) {
+                console.error("Handle request failed", err);
+            }
+        }
+
+        // --- 3. FRIENDS LIST & STREAKS ---
+        async function loadFriends() {
+    try {
+        const res = await fetch('/api/friendships/list', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const result = await res.json();
+        const list = document.getElementById('friendsList');
+
+        if (result.success && result.data && result.data.length > 0) {
+            list.innerHTML = result.data.map(friend => {
+                const count = friend.streak ?? 0;
+                const s = getStreakStyle(count);
+
+                return `
+                    <div class="user-card" style="border-left: 5px solid ${count > 0 ? 'var(--pastel-yellow)' : '#eee'}">
+                        <div class="user-info">
+                            <div class="user-pic" style="background: var(--pastel-green)">
+                                ${avatarInnerHtml(friend.avatar, friend.username)}
+                            </div>
+                            <span style="font-weight: 700; font-size: 1.1rem;">${friend.username}</span>
+                        </div>
+
+<div style="display: flex; align-items: center; gap: 10px;">
+    <div class="streak-badge ${s.class}">
+        <span class="streak-emoji">${s.emoji}</span>
+        <span>${count}</span>
+    </div>
+
+    <button class="btn-poke" onclick="openFriendProfile('${friend._id}')"
+            style="background: var(--pastel-purple);">
+        👤
+    </button>
+
+    <button class="btn-poke" onclick="openChat('${friend._id}')"
+            style="background: var(--pastel-green);">
+        💬
+    </button>
+
+    <button class="btn-poke" onclick="pokeFriend('${friend._id}', '${friend.username}', this)">
+        👉
+    </button>
+
+    <button class="btn-delete" onclick="unfriend('${friend._id}')" 
+            style="background:#ffb8b8; color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:700;">
+        Unfriend
+    </button>
+</div> 
+                    </div>
+                `;
+            }).join('');
+        } else {
+            list.innerHTML = '<div class="empty-msg">No friends yet. Go find some Loopers!</div>';
+        }
+    } catch (err) {
+        console.error("Failed to load friends", err);
+    }
+}
+        async function unfriend(friendId) {
+            if (!confirm("Remove this friend? Shared streaks will be lost!")) return;
+            try {
+                const res = await fetch(`/api/friendships/unfriend/${friendId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await res.json();
+                if (result.success) loadFriends();
+            } catch (err) {
+                console.error("Unfriend failed", err);
+            }
+        }
+        // --- 4. CANCEL SENT REQUEST ---
+        async function cancelRequest(recipientId) {
+    try {
+        const res = await fetch(`/api/friendships/cancel/${recipientId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+            // Remove from local tracker if it was there
+            sentRequestIds = sentRequestIds.filter(id => id !== recipientId);
+            
+            // Refresh the search results to show the "Add Friend" button again
+            const query = searchInput.value;
+            if (query) searchUsers(query); 
+        } else {
+            alert(result.message);
+        }
+    } catch (err) {
+        console.error("Cancel request failed", err);
+    }
+}        loadFriendRequests();
+
+function getStreakStyle(count) {
+    if (count >= 7) return { class: 'streak-supernova', emoji: '💠🔥' }; 
+    if (count >= 3) return { class: 'streak-blaze', emoji: '🔥' };     
+    return { class: 'streak-ember', emoji: '🔥' };                    
+}
+async function pokeFriend(friendId, username, btn) {
+    try {
+        const res = await fetch(`/api/friendships/poke/${friendId}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+            const originalEmoji = btn.innerText;
+            const originalBG = btn.style.background;
+            
+            // Visual feedback: Match the "Ember" or "Green" theme briefly
+            btn.innerText = '✅';
+            btn.style.background = 'var(--pastel-green)';
+            
+            setTimeout(() => {
+                btn.innerText = originalEmoji;
+                btn.style.background = originalBG;
+            }, 2000);
+            
+            showToast(`Poked ${username}!`);
+        } else {
+            alert(result.message);
+        }
+    } catch (err) {
+        console.error("Poke failed", err);
+    }
+} loadFriends();
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.innerText = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+function openFriendProfile(friendId) {
+    window.location.href = `/u/${friendId}`;
+}
+function openChat(friendId) {
+    window.location.href = `/chat/${friendId}`;
+}
+    </script></body>
+</html>

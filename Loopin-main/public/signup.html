@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Loopin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        :root {
+            --pastel-green: #A8E6CF;
+            --pastel-green-dark: #7DC4A5;
+            --pastel-blue: #A8D8EA;
+            --pastel-blue-dark: #7BB8CC;
+            --pastel-yellow: #FFEAA7;
+            --pastel-pink: #FFB8B8;
+            --pastel-purple: #DDA0DD;
+            --white: #FFFFFF;
+            --soft-gray: #F5F5F5;
+            --text-dark: #4A4A4A;
+            --text-light: #7A7A7A;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .loopin-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 10px 24px rgba(109, 149, 129, 0.24));
+        }
+
+        .loopin-logo svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+        }
+
+        .loopin-logo .loop {
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: signupDrawLoop 3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+        }
+
+        .loopin-logo .dot {
+            offset-path: path("M100 30 A70 70 0 1 1 99.9 30");
+            animation: signupMoveDot 3s linear infinite;
+        }
+
+        .loopin-logo .glow {
+            filter: drop-shadow(0 0 14px rgba(255, 120, 60, 0.45));
+        }
+
+        .loopin-logo .flame {
+            transform-origin: center;
+            animation: signupFlameFloat 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-outer {
+            filter: blur(0.4px) drop-shadow(0 0 14px rgba(255, 100, 40, 0.52));
+            animation: signupFlameWobble 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-inner {
+            opacity: 0.95;
+            animation: signupFlameInner 1.3s ease-in-out infinite;
+        }
+
+        @keyframes signupDrawLoop {
+            0% { stroke-dashoffset: 600; opacity: 0; }
+            20% { opacity: 1; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -600; opacity: 0; }
+        }
+
+        @keyframes signupMoveDot {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+
+        @keyframes signupFlameFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        @keyframes signupFlameWobble {
+            0%, 100% { transform: scale(1, 1) skewX(0deg); }
+            50% { transform: scale(1.05, 0.95) skewX(-2deg); }
+        }
+
+        @keyframes signupFlameInner {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08, 0.92); }
+        }
+
+        .app-title {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pastel-green-dark) 0%, var(--pastel-blue-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .signup-card {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+            border: 3px solid var(--pastel-green);
+        }
+
+        .card-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 22px;
+            border: 3px solid var(--soft-gray);
+            border-radius: 18px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            background: var(--soft-gray);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--pastel-green);
+            background: var(--white);
+            box-shadow: 0 6px 20px rgba(168, 230, 207, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: #B0B0B0;
+        }
+
+        .btn-signup {
+            width: 100%;
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+            color: #2D6A4F;
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 0 var(--pastel-green-dark), 0 10px 20px rgba(168, 230, 207, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--pastel-green-dark), 0 14px 25px rgba(168, 230, 207, 0.5);
+        }
+
+        .btn-signup:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--pastel-green-dark);
+        }
+
+        .btn-signup:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: var(--text-light);
+            font-weight: 600;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 2px;
+            background: var(--soft-gray);
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .login-link {
+            text-align: center;
+        }
+
+        .login-link a {
+            color: var(--pastel-blue-dark);
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: var(--pastel-green-dark);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: var(--text-light);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link a:hover {
+            color: var(--text-dark);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .alert-error {
+            background: #FFE5E5;
+            color: #CC4444;
+            border: 2px solid #FFB8B8;
+        }
+
+        .alert-success {
+            background: #E5FFE5;
+            color: #44AA44;
+            border: 2px solid #A8E6CF;
+        }
+
+        .mascot {
+            text-align: center;
+            font-size: 40px;
+            margin-top: 25px;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="logo-section">
+            <div class="loopin-logo" aria-label="Loopin logo">
+                <svg viewBox="0 0 200 200" role="img" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="signupLoopGradient">
+                            <stop offset="0%" stop-color="#FFA85C"/>
+                            <stop offset="50%" stop-color="#CE65FF"/>
+                            <stop offset="100%" stop-color="#5ED4A2"/>
+                        </linearGradient>
+                        <radialGradient id="signupFlameOuterGrad" cx="50%" cy="65%" r="60%">
+                            <stop offset="0%" stop-color="#FFF3B0"/>
+                            <stop offset="40%" stop-color="#FFA85C"/>
+                            <stop offset="100%" stop-color="#FF3D00"/>
+                        </radialGradient>
+                        <radialGradient id="signupFlameInnerGrad" cx="50%" cy="70%" r="50%">
+                            <stop offset="0%" stop-color="#FFFFFF"/>
+                            <stop offset="100%" stop-color="#FFB347"/>
+                        </radialGradient>
+                    </defs>
+
+                    <path d="M100 30 A70 70 0 1 1 99.9 30" fill="none" stroke="url(#signupLoopGradient)" stroke-width="12" stroke-linecap="round" class="loop glow"/>
+                    <circle r="4" fill="#FFD166" class="dot glow"></circle>
+
+                    <g class="flame">
+                        <path d="M100 120 C82 100, 85 78, 98 60 C106 72, 118 85, 112 102 C109 112, 103 118, 100 120 Z" fill="url(#signupFlameOuterGrad)" class="flame-outer"/>
+                        <path d="M100 110 C90 95, 96 80, 100 70 C105 80, 108 92, 102 108 Z" fill="url(#signupFlameInnerGrad)" class="flame-inner"/>
+                    </g>
+                </svg>
+            </div>
+            <h1 class="app-title">Loopin</h1>
+        </div>
+
+        <div class="signup-card">
+            <h2 class="card-title">Join Loopin!</h2>
+            <p class="card-subtitle">Start building better habits today</p>
+
+            <div class="alert alert-error" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="username" placeholder="Choose a cool username" required minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" id="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Create a strong password" required minlength="6">
+                    <p class="password-requirements">At least 6 characters</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+
+                <button type="submit" class="btn-signup" id="signupBtn">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <div class="login-link">
+                Already have an account? <a href="/login">Login here!</a>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+
+        // Check if already logged in
+        if (localStorage.getItem('loopin_token')) {
+            window.location.href = '/home';
+        }
+
+        const signupForm = document.getElementById('signupForm');
+        const signupBtn = document.getElementById('signupBtn');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+
+        function showError(message) {
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            successAlert.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            errorAlert.style.display = 'none';
+        }
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validation
+            if (password !== confirmPassword) {
+                showError('Passwords do not match!');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters!');
+                return;
+            }
+
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+
+                    // Fresh session bootstrap: clear stale cross-user client state first.
+                    localStorage.removeItem('token'); // legacy key used in some pages
+                    localStorage.removeItem('last_rank');
+                    sessionStorage.clear();
+
+                    localStorage.setItem('loopin_token', data.data.token);
+                    localStorage.setItem('loopin_user', JSON.stringify(data.data.user));
+                    
+                    setTimeout(() => {
+                        window.location.replace('/home');
+                    }, 1500);
+                } else {
+                    showError(data.message);
+                    signupBtn.disabled = false;
+                    signupBtn.textContent = 'Create Account';
+                }
+            } catch (error) {
+                showError('Connection error. Please try again.');
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopin - Profile Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/cropperjs/cropper.min.css">
+    <link rel="stylesheet" href="/lib/premium-badge.css">
+    <link rel="stylesheet" href="/lib/premium-modal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        :root {
+            --pastel-green: #A8E6CF;
+            --pastel-green-dark: #7DC4A5;
+            --pastel-blue: #A8D8EA;
+            --pastel-blue-dark: #7BB8CC;
+            --pastel-yellow: #FFEAA7;
+            --pastel-yellow-dark: #F0D78A;
+            --pastel-pink: #FFB8B8;
+            --pastel-pink-dark: #E89A9A;
+            --pastel-purple: #DDA0DD;
+            --white: #FFFFFF;
+            --soft-gray: #F5F5F5;
+            --text-dark: #4A4A4A;
+            --text-light: #7A7A7A;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--white);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-back {
+            background: var(--soft-gray);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Header user row (username + premium badge) */
+        .settings-user-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .settings-header-name {
+            font-weight: 800;
+            color: var(--text-dark);
+            font-size: 15px;
+        }
+
+        /* SECTION */
+        .profile-section {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 1. EDIT AVATAR STYLES */
+        .avatar-editor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .avatar-preview-lg {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-purple) 100%);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 5px solid white;
+            overflow: hidden;
+            line-height: 1;
+        }
+
+        .avatar-preview-lg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+        .upload-row {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .btn-upload {
+            background: var(--pastel-blue);
+            color: #2D5A6A;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .btn-upload:hover {
+            filter: brightness(0.97);
+            transform: translateY(-2px);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Variant for the quick-upload button (same shape, slightly different color) */
+        .btn-upload.btn-upload-alt {
+            background: var(--pastel-green);
+            color: #2D6A4F;
+            font-weight: 800;
+            border-radius: 16px;
+            padding: 12px 20px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .crop-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .crop-modal.open {
+            display: flex;
+        }
+
+        .crop-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(45, 52, 54, 0.45);
+        }
+
+        .crop-modal-card {
+            position: relative;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 22px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 92vh;
+            overflow: auto;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .crop-modal-card h3 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .crop-wrap {
+            max-height: min(55vh, 400px);
+            background: #222;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 12px 0 16px;
+        }
+
+        .crop-wrap img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .crop-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel-crop {
+            background: var(--soft-gray);
+            color: var(--text-dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-apply-crop {
+            background: var(--pastel-green);
+            color: #2D6A4F;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .avatar-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .avatar-item {
+            aspect-ratio: 1;
+            background: var(--soft-gray);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .avatar-item:hover {
+            transform: scale(1.1);
+            background: var(--white);
+            border-color: var(--pastel-green);
+        }
+
+        .avatar-item.active {
+            border-color: var(--pastel-green);
+            background: var(--white);
+            box-shadow: 0 5px 15px rgba(168, 230, 207, 0.5);
+        }
+
+        /* 2. PREMIUM CARD STYLES */
+        .premium-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-content h3 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .premium-content p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .btn-upgrade {
+            background: var(--pastel-yellow);
+            color: #8B7355;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 234, 167, 0.4);
+        }
+
+        /* 3. SETTINGS INPUTS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid var(--soft-gray);
+            font-family: inherit;
+            font-size: 16px;
+        }
+
+        body.premium-route-leaving {
+            animation: premiumRouteLeave .22s cubic-bezier(.22, .8, .2, 1) forwards;
+        }
+
+        @keyframes premiumRouteLeave {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: .92; transform: translateY(6px); }
+        }
+
+        @media (max-width: 600px) {
+            .premium-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a href="/home" class="btn-back">← Back to Dashboard</a>
+            <div class="settings-user-row" aria-live="polite">
+                <span class="settings-header-name" id="settingsHeaderUsername">User</span>
+                <span class="premium-badge" id="settingsPremiumBadge" style="display:none;"><span class="premium-badge-icon" aria-hidden="true">👑</span>Premium</span>
+            </div>
+        </nav>
+
+        <section class="profile-section">
+            <h2 class="section-title"><span>👤</span> Character Avatar</h2>
+            <div class="avatar-editor">
+                <div class="avatar-preview-lg" id="mainAvatar">🐱</div>
+
+                <div style="width: 100%;">
+                    <p class="label">Choose your character style:</p>
+                    <div class="avatar-options" id="avatarPicker">
+                        <div class="avatar-item active" data-char="🐱">🐱</div>
+                        <div class="avatar-item" data-char="🦊">🦊</div>
+                        <div class="avatar-item" data-char="🐼">🐼</div>
+                        <div class="avatar-item" data-char="🦁">🦁</div>
+                        <div class="avatar-item" data-char="🐸">🐸</div>
+                        <div class="avatar-item" data-char="🦄">🦄</div>
+                        <div class="avatar-item" data-char="🤖">🤖</div>
+                        <div class="avatar-item" data-char="👻">👻</div>
+                    </div>
+                </div>
+                <div class="upload-row">
+                    <p class="label">Or upload your own photo:</p>
+                    <!-- Existing cropper-enabled upload (keeps the current crop modal flow) -->
+                    <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+                    <button type="button" class="btn-upload" id="btnPickAvatar"> Choose photo (Edit & Crop)</button>
+
+                    <!-- New simplified upload: immediate preview, 2MB max, accepts only JPG/PNG -->
+                    <input type="file" id="simpleAvatarFile" accept="image/jpeg,image/png" hidden>
+                    <button type="button" class="btn-upload btn-upload-alt" id="btnUploadAvatar"> Upload Avatar (Quick)</button>
+
+                    <p class="upload-hint">JPEG or PNG only. Quick upload preview (up to 2 MB). Use the other
+                        button if you want to crop/edit your photo before saving.</p>
+                </div>
+                <button onclick="saveChanges()" class="btn-upgrade"
+                    style="background: var(--pastel-green); color: #2D6A4F; width: 100%; padding: 18px;">
+                    Save Avatar Changes
+                </button>
+            </div>
+        </section>
+
+        <section id="premiumSection" class="profile-section">
+            <h2 class="section-title"><span>👑</span> Loopin Premium</h2>
+            <div class="premium-banner">
+                <div class="premium-content">
+                    <h3>Unlock Full Potential</h3>
+                    <p>Get unlimited habits, advanced analytics, and exclusive legendary avatars!</p>
+                    <button class="btn-upgrade" id="settingsPremiumBtn" type="button">Upgrade to Pro - $1.99/mo</button>
+                </div>
+                <div style="font-size: 60px;">💎</div>
+            </div>
+        </section>
+
+        <section class="profile-section">
+            <h2 class="section-title"><span>⚙️</span> Basic Information</h2>
+            <div class="form-group">
+                <label class="label">Display Name</label>
+                <input type="text" class="input-field" value="User" id="editUsername">
+            </div>
+            <div class="form-group">
+                <label class="label">Email Address</label>
+                <input type="email" class="input-field" value="user@example.com" id="editEmail">
+            </div>
+            <button onclick="saveChanges()" class="btn-upgrade"
+                style="background: var(--soft-gray); color: var(--text-dark); width: 100%; padding: 15px;">
+                Update Profile
+            </button>
+        </section>
+    </div>
+
+    <div id="cropModal" class="crop-modal" aria-hidden="true">
+        <div class="crop-modal-backdrop" id="cropModalBackdrop"></div>
+        <div class="crop-modal-card" role="dialog" aria-labelledby="cropModalTitle">
+            <h3 id="cropModalTitle">Adjust your photo</h3>
+            <p class="upload-hint">Drag to move the image, use the handles to zoom. The square area is your profile
+                picture.</p>
+            <div class="crop-wrap">
+                <img id="cropImage" alt="">
+            </div>
+            <div class="crop-actions">
+                <button type="button" class="btn-cancel-crop" id="btnCancelCrop">Cancel</button>
+                <button type="button" class="btn-apply-crop" id="btnApplyCrop">Use this crop</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/lib/cropperjs/cropper.min.js"></script>
+    <script src="/lib/premium-badge.js"></script>
+    <script src="/lib/premium-service.js"></script>
+    <script src="/lib/subscription-store.js"></script>
+    <script src="/lib/premium-modal.js"></script>
+    <script>
+        const token = localStorage.getItem('loopin_token');
+        if (!token) window.location.href = '/login';
+
+        /** Saved-on-server path, emoji, or full URL — never a blob: preview URL */
+        let currentAvatarValue = '🐱';
+        let pendingCroppedBlob = null;
+        let pendingPreviewUrl = null;
+        let cropperInstance = null;
+        let cropSourceUrl = null;
+    let currentSettingsUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+
+        const cropModal = document.getElementById('cropModal');
+        const cropImageEl = document.getElementById('cropImage');
+
+        function isImageAvatar(val) {
+            if (val == null || String(val).trim() === '') return false;
+            const s = String(val).trim();
+            return /^https?:\/\//i.test(s) || s.startsWith('/uploads/');
+        }
+
+        function clearPendingPhoto() {
+            if (pendingPreviewUrl) {
+                URL.revokeObjectURL(pendingPreviewUrl);
+                pendingPreviewUrl = null;
+            }
+            pendingCroppedBlob = null;
+        }
+
+        function destroyCropper() {
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+        }
+
+        function closeCropModal() {
+            if (document.activeElement && cropModal.contains(document.activeElement)) {
+                document.activeElement.blur();
+                const pickBtn = document.getElementById('btnPickAvatar');
+                if (pickBtn) pickBtn.focus();
+            }
+            destroyCropper();
+            if (cropSourceUrl) {
+                URL.revokeObjectURL(cropSourceUrl);
+                cropSourceUrl = null;
+            }
+            cropImageEl.removeAttribute('src');
+            cropModal.classList.remove('open');
+            cropModal.setAttribute('aria-hidden', 'true');
+        }
+
+        function openCropModal(file) {
+            if (typeof Cropper === 'undefined') {
+                alert('Photo editor could not load. Check your internet connection and refresh the page.');
+                return;
+            }
+            if (cropSourceUrl) URL.revokeObjectURL(cropSourceUrl);
+            cropSourceUrl = URL.createObjectURL(file);
+            cropModal.classList.add('open');
+            cropModal.setAttribute('aria-hidden', 'false');
+            destroyCropper();
+            cropImageEl.onload = () => {
+                destroyCropper();
+                cropperInstance = new Cropper(cropImageEl, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 0.92,
+                    background: false
+                });
+            };
+            cropImageEl.src = cropSourceUrl;
+        }
+
+        function updateAvatarPreview() {
+            const el = document.getElementById('mainAvatar');
+            if (pendingPreviewUrl) {
+                const safe = pendingPreviewUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                el.innerHTML = `<img src="${safe}" alt="">`;
+                return;
+            }
+            const v = currentAvatarValue == null || String(currentAvatarValue).trim() === '' ? '🐱' : String(currentAvatarValue).trim();
+            if (isImageAvatar(v)) {
+                const safe = v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                el.innerHTML = `<img src="${safe}" alt="">`;
+            } else {
+                el.textContent = v;
+            }
+        }
+
+        function setAvatarFromEmoji(emoji) {
+            clearPendingPhoto();
+            currentAvatarValue = emoji;
+            updateAvatarPreview();
+        }
+
+        // Reusable header sync: keeps username + premium badge in one place
+        function syncSettingsHeader(user) {
+            const nameEl = document.getElementById('settingsHeaderUsername');
+            const badgeEl = document.getElementById('settingsPremiumBadge');
+            if (window.PremiumBadgeUI && typeof window.PremiumBadgeUI.renderUsernameWithBadge === 'function') {
+                window.PremiumBadgeUI.renderUsernameWithBadge(nameEl, badgeEl, user);
+            } else {
+                if (nameEl) nameEl.textContent = user && user.username ? String(user.username) : 'User';
+                if (badgeEl) badgeEl.style.display = user && user.isPremium === true ? 'inline-flex' : 'none';
+            }
+
+            if (badgeEl) {
+                const expiry = user && user.subscriptionEnd ? user.subscriptionEnd : null;
+                badgeEl.title = user && user.isPremium === true && expiry
+                    ? ('Your plan expires on ' + new Date(expiry).toLocaleDateString())
+                    : '';
+            }
+
+            currentSettingsUser = user || {};
+            const premiumBtn = document.getElementById('settingsPremiumBtn');
+            if (premiumBtn) {
+                premiumBtn.textContent = currentSettingsUser.isPremium === true
+                    ? 'View Premium Plan'
+                    : 'Upgrade to Pro - $1.99/mo';
+            }
+        }
+
+        function openSettingsPremiumModal() {
+            if (!window.LoopinPremiumModal) return;
+            const u = currentSettingsUser || JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            window.LoopinPremiumModal.open(u, {
+                upgrade: function () {
+                    navigateToPremiumPayment('/settings');
+                },
+                manage: function () {
+                    navigateToPremiumPayment('/settings');
+                },
+                cancel: function () {
+                    alert('Please contact support to cancel your plan for now.');
+                }
+            });
+        }
+
+        function navigateToPremiumPayment(originPath) {
+            const returnTo = `${originPath}?openPremium=1`;
+            const target = `/premium-payment?returnTo=${encodeURIComponent(returnTo)}`;
+
+            document.body.classList.add('premium-route-leaving');
+            if (window.LoopinPremiumModal) window.LoopinPremiumModal.close();
+
+            setTimeout(() => {
+                window.location.href = target;
+            }, 220);
+        }
+
+        function maybeReopenPremiumModalFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('openPremium') !== '1') return;
+
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+
+            setTimeout(() => {
+                openSettingsPremiumModal();
+            }, 140);
+        }
+
+        // 1. Load user data and pre-fill form
+        async function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            const userId = userData._id || userData.id;
+            const auth = localStorage.getItem('loopin_token');
+
+            if (!userId) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/users/profile?userId=${encodeURIComponent(userId)}`, {
+                    headers: { 'Authorization': `Bearer ${auth}` }
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    const user = result.data;
+                    localStorage.setItem('loopin_user', JSON.stringify(user));
+                    syncSettingsHeader(user);
+                    maybeReopenPremiumModalFromUrl();
+                    document.getElementById('editUsername').value = user.username;
+                    document.getElementById('editEmail').value = user.email;
+                    clearPendingPhoto();
+                    currentAvatarValue = user.avatar || '🐱';
+                    updateAvatarPreview();
+                    if (isImageAvatar(currentAvatarValue)) {
+                        avatarItems.forEach(i => i.classList.remove('active'));
+                    } else {
+                        updateAvatarPickerUI(currentAvatarValue);
+                    }
+                    // Keep premium section visible for both states; button opens reusable modal.
+                }
+            } catch (err) {
+                console.error('Error loading profile:', err);
+            }
+        }
+
+        // Initial sync from localStorage for instant render before API response
+        syncSettingsHeader(JSON.parse(localStorage.getItem('loopin_user') || '{}'));
+        const settingsPremiumBtn = document.getElementById('settingsPremiumBtn');
+        if (settingsPremiumBtn) {
+            settingsPremiumBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                openSettingsPremiumModal();
+            });
+        }
+        const settingsPremiumBadge = document.getElementById('settingsPremiumBadge');
+        if (settingsPremiumBadge) {
+            settingsPremiumBadge.addEventListener('click', function (e) {
+                e.preventDefault();
+                openSettingsPremiumModal();
+            });
+        }
+
+        const avatarItems = document.querySelectorAll('.avatar-item');
+
+        avatarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                avatarItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                setAvatarFromEmoji(item.dataset.char);
+            });
+        });
+
+        function updateAvatarPickerUI(currentAvatar) {
+            avatarItems.forEach(el => {
+                el.classList.toggle('active', el.dataset.char === currentAvatar);
+            });
+        }
+
+        const avatarFileInput = document.getElementById('avatarFile');
+        const btnPickAvatar = document.getElementById('btnPickAvatar');
+
+        btnPickAvatar.addEventListener('click', () => avatarFileInput.click());
+
+        // -------- Quick Upload (no crop) --------
+        // This provides an immediate preview experience for JPG/PNG files up to 2MB.
+        // It complements the existing cropper flow (which is kept as-is).
+        const simpleAvatarFileInput = document.getElementById('simpleAvatarFile');
+        const btnUploadAvatar = document.getElementById('btnUploadAvatar');
+
+        // Open file picker when the quick upload button is clicked
+        btnUploadAvatar.addEventListener('click', () => simpleAvatarFileInput.click());
+
+        // Handle quick upload file selection
+        simpleAvatarFileInput.addEventListener('change', () => {
+            const file = simpleAvatarFileInput.files[0];
+            // reset input so same file can be picked again if needed
+            simpleAvatarFileInput.value = '';
+            if (!file) return;
+
+            // Basic validation: only JPEG/PNG, max 2MB
+            if (!/^image\/(jpeg|png)$/i.test(file.type)) {
+                alert('Please choose a JPEG or PNG image for quick upload.');
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) { // 2 MB
+                alert('File is larger than 2 MB. Pick a smaller image.');
+                return;
+            }
+
+            // Use the file as the pending avatar. We reuse existing preview logic.
+            clearPendingPhoto(); // revoke any previous preview URL
+            pendingCroppedBlob = file; // store File so postAvatarIfPending can upload it
+            pendingPreviewUrl = URL.createObjectURL(file);
+
+            // Deselect emoji/avatar items (uploaded image is now the selected avatar)
+            avatarItems.forEach(i => i.classList.remove('active'));
+            updateAvatarPreview();
+        });
+
+        avatarFileInput.addEventListener('change', () => {
+            const file = avatarFileInput.files[0];
+            avatarFileInput.value = '';
+            if (!file) return;
+            if (!/^image\/(jpeg|png|gif|webp)$/i.test(file.type)) {
+                alert('Please choose a JPEG, PNG, GIF, or WebP image.');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File is larger than 10 MB. Pick a smaller image.');
+                return;
+            }
+            openCropModal(file);
+        });
+
+        document.getElementById('btnCancelCrop').addEventListener('click', () => closeCropModal());
+        document.getElementById('cropModalBackdrop').addEventListener('click', () => closeCropModal());
+
+        document.getElementById('btnApplyCrop').addEventListener('click', () => {
+            if (!cropperInstance) return;
+            const canvas = cropperInstance.getCroppedCanvas({
+                width: 400,
+                height: 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            if (!canvas) {
+                alert('Could not read the image. Try another file.');
+                return;
+            }
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    alert('Could not process the image.');
+                    return;
+                }
+                closeCropModal();
+                clearPendingPhoto();
+                pendingCroppedBlob = blob;
+                pendingPreviewUrl = URL.createObjectURL(blob);
+                avatarItems.forEach(i => i.classList.remove('active'));
+                updateAvatarPreview();
+            }, 'image/jpeg', 0.92);
+        });
+
+        async function postAvatarIfPending() {
+            if (!pendingCroppedBlob) return { ok: true, avatarPath: currentAvatarValue };
+            // If pendingCroppedBlob is already a File (quick upload), use it directly.
+            // Otherwise (from cropper) it's a Blob and we wrap it into a JPEG File.
+            let file;
+            if (pendingCroppedBlob instanceof File) {
+                file = pendingCroppedBlob;
+            } else {
+                file = new File([pendingCroppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+            }
+            const fd = new FormData();
+            fd.append('avatar', file);
+            const res = await fetch('/api/users/avatar', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: fd
+            });
+            const result = await res.json();
+            if (!result.success) {
+                return { ok: false, message: result.message || 'Photo upload failed' };
+            }
+            localStorage.setItem('loopin_user', JSON.stringify(result.data));
+            clearPendingPhoto();
+            currentAvatarValue = result.data.avatar;
+            updateAvatarPreview();
+            return { ok: true, avatarPath: currentAvatarValue };
+        }
+
+        async function saveChanges() {
+            const username = document.getElementById('editUsername').value;
+            const email = document.getElementById('editEmail').value;
+
+            const userData = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            const userId = userData._id || userData.id;
+            const auth = localStorage.getItem('loopin_token');
+
+            try {
+                const up = await postAvatarIfPending();
+                if (!up.ok) {
+                    alert(up.message);
+                    return;
+                }
+                const avatar = up.avatarPath;
+
+                const res = await fetch('/api/users/update-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${auth}`
+                    },
+                    body: JSON.stringify({ userId, username, email, avatar })
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    localStorage.setItem('loopin_user', JSON.stringify(result.data));
+                    alert('Profile updated successfully! ✨');
+                    window.location.href = '/home';
+                } else {
+                    alert(result.message || 'Update failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Server error, please try again.');
+            }
+        }
+        // 4. Upgrade Premium
+        async function upgradeToPremium() {
+            try {
+                const res = await fetch('http://localhost:3001/api/users/upgrade', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) location.reload();
+            } catch (err) {
+                alert('Upgrade failed');
+            }
+        }
+
+
+        loadUserData();
+    </script>
+</body>
+
+</html>

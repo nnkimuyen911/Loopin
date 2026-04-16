@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loopin - Friend Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%); min-height:100vh; padding:20px; }
+    :root { --pastel-green:#A8E6CF; --pastel-green-dark:#7DC4A5; --pastel-blue:#A8D8EA; --pastel-blue-dark:#7BB8CC; --pastel-purple:#DDA0DD; --white:#fff; --soft-gray:#F5F5F5; --text-dark:#4A4A4A; --text-light:#7A7A7A; --pastel-pink:#FFB8B8; }
+    .container { max-width: 760px; margin: 0 auto; }
+    .navbar { display:flex; justify-content:space-between; align-items:center; padding: 15px 25px; background: var(--white); border-radius: 20px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+    .nav-links { display:flex; gap: 10px; }
+    .nav-links a { text-decoration:none; font-weight: 800; color: var(--text-light); background: var(--soft-gray); padding: 10px 14px; border-radius: 14px; }
+    .card { background: var(--white); border-radius: 28px; padding: 26px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 3px solid var(--pastel-blue); }
+    .profile { display:flex; gap: 18px; align-items:center; }
+    .avatar { width: 72px; height: 72px; border-radius: 22px; display:flex; align-items:center; justify-content:center; font-size: 38px; line-height: 1; background: linear-gradient(135deg, var(--pastel-purple) 0%, var(--pastel-blue) 100%); color:#2D5A6A; box-shadow: 0 10px 25px rgba(168, 216, 234, 0.35); overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .name { font-size: 26px; font-weight: 900; color: var(--text-dark); }
+    .meta { margin-top: 4px; color: var(--text-light); font-weight: 700; }
+    .stats { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+    .stat { background: #fafafa; border: 2px solid #f0f0f0; border-radius: 22px; padding: 14px; text-align:center; }
+    .stat .val { font-size: 20px; font-weight: 900; color: var(--text-dark); }
+    .stat .lbl { font-size: 12px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; }
+    .actions { display:flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+    .btn { border:none; cursor:pointer; font-family:'Nunito', sans-serif; font-weight: 900; padding: 14px 18px; border-radius: 18px; transition: 0.2s; }
+    .btn:hover { transform: translateY(-2px); filter: brightness(0.98); }
+    .btn-primary { background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%); color:#2D6A4F; box-shadow: 0 8px 0 var(--pastel-green-dark), 0 12px 25px rgba(168,230,207,0.35); }
+    .btn-secondary { background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-blue-dark) 100%); color:#2D5A6A; box-shadow: 0 8px 0 var(--pastel-blue-dark), 0 12px 25px rgba(168,216,234,0.35); }
+    .error { margin-top: 12px; background: #FFE5E5; border: 2px solid var(--pastel-pink); color:#CC4444; padding: 14px 16px; border-radius: 18px; font-weight: 800; display:none; }
+    .loading { color: var(--text-light); font-weight: 800; }
+    @media (max-width: 560px) {
+      .stats { grid-template-columns: 1fr; }
+      .profile { flex-direction: column; align-items:flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <div style="font-weight: 900; color: var(--text-dark);">Friend Profile</div>
+      <div class="nav-links">
+        <a href="/friends">← Friends</a>
+        <a href="/home">🏠 Home</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="profile">
+        <div id="avatar" class="avatar">👤</div>
+        <div>
+          <div id="username" class="name">Loading…</div>
+          <div id="joined" class="meta loading">Fetching profile</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div id="level" class="val">—</div>
+          <div class="lbl">Level</div>
+        </div>
+        <div class="stat">
+          <div id="xp" class="val">—</div>
+          <div class="lbl">XP</div>
+        </div>
+        <div class="stat">
+          <div id="friendId" class="val" style="font-size: 12px; word-break: break-all;">—</div>
+          <div class="lbl">User ID</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnMessage">Message 💬</button>
+        <button class="btn btn-secondary" onclick="window.location.href='/friends'">Back to Friends</button>
+      </div>
+
+      <div id="error" class="error"></div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('loopin_token');
+    if (!token) window.location.href = '/login';
+
+    const friendId = (location.pathname.split('/u/')[1] || '').trim();
+    document.getElementById('friendId').textContent = friendId || '—';
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function setAvatarEl(el, avatar) {
+      if (avatar == null || String(avatar).trim() === '') {
+        el.textContent = '🐱';
+        return;
+      }
+      const a = String(avatar).trim();
+      if (/^https?:\/\//i.test(a) || a.startsWith('/uploads/')) {
+        const safe = a.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        el.innerHTML = `<img src="${safe}" alt="">`;
+        return;
+      }
+      el.textContent = a;
+    }
+
+    async function loadProfile() {
+      try {
+        if (!friendId) {
+          showError('Missing friend id.');
+          return;
+        }
+        const res = await fetch(`/api/users/friend-profile?userId=${encodeURIComponent(friendId)}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (!data.success) {
+          showError(data.message || 'Failed to load profile.');
+          document.getElementById('joined').textContent = '—';
+          return;
+        }
+        const u = data.data;
+        setAvatarEl(document.getElementById('avatar'), u.avatar);
+        document.getElementById('username').textContent = u.username || 'Unknown';
+        document.getElementById('level').textContent = (u.level ?? 1);
+        document.getElementById('xp').textContent = (u.xp ?? 0);
+        const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '';
+        document.getElementById('joined').textContent = joined ? ('Joined: ' + joined) : '';
+      } catch (e) {
+        showError('Error loading profile.');
+      }
+    }
+
+    document.getElementById('btnMessage').addEventListener('click', () => {
+      if (!friendId) return;
+      window.location.href = `/chat/${encodeURIComponent(friendId)}`;
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>
+

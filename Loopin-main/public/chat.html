@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loopin - Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    :root {
+      --pastel-green: #A8E6CF;
+      --pastel-green-dark: #7DC4A5;
+      --pastel-blue: #A8D8EA;
+      --pastel-blue-dark: #7BB8CC;
+      --pastel-purple: #DDA0DD;
+      --white: #fff;
+      --soft-gray: #F5F5F5;
+      --text-dark: #4A4A4A;
+      --text-light: #7A7A7A;
+      --pastel-pink: #FFB8B8;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 14px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: linear-gradient(135deg, var(--pastel-purple) 0%, var(--pastel-blue) 100%);
+    }
+
+    .who {
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .sub {
+      font-weight: 800;
+      color: var(--text-light);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .links a {
+      text-decoration: none;
+      font-weight: 900;
+      color: var(--text-light);
+      background: var(--soft-gray);
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin-left: 8px;
+      display: inline-block;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 28px;
+      padding: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      border: 3px solid var(--pastel-blue);
+    }
+
+    .messages {
+      height: 62vh;
+      min-height: 420px;
+      overflow: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bubble {
+      max-width: 76%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+      position: relative;
+    }
+
+    .me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+      color: #1f5e45;
+    }
+
+    .them {
+      align-self: flex-start;
+      background: #f7f7f7;
+      border: 2px solid #f0f0f0;
+      color: var(--text-dark);
+    }
+
+    .time {
+      font-size: 11px;
+      font-weight: 900;
+      opacity: 0.7;
+      margin-top: 6px;
+    }
+
+    .composer {
+      display: flex;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 2px solid #f3f3f3;
+    }
+
+    .input {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 3px solid var(--soft-gray);
+      background: var(--soft-gray);
+      outline: none;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .input:focus {
+      border-color: var(--pastel-blue);
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(168, 216, 234, 0.25);
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      border-radius: 18px;
+      padding: 14px 16px;
+      min-width: 110px;
+      transition: 0.2s;
+      background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-blue-dark) 100%);
+      color: #2D5A6A;
+      box-shadow: 0 8px 0 var(--pastel-blue-dark), 0 12px 25px rgba(168, 216, 234, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error {
+      margin-top: 10px;
+      background: #FFE5E5;
+      border: 2px solid var(--pastel-pink);
+      color: #CC4444;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-weight: 900;
+      display: none;
+    }
+
+    @media (max-width: 560px) {
+      .messages {
+        height: 66vh;
+      }
+
+      .btn {
+        min-width: 92px;
+        padding: 14px 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="title">
+        <div id="friendAvatar" class="avatar">💬</div>
+        <div>
+          <div id="friendName" class="who">Chat</div>
+          <div id="hint" class="sub">Friends only</div>
+        </div>
+      </div>
+      <div class="links">
+        <a id="profileLink" href="/friends">Profile</a>
+        <a href="/friends">← Friends</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="messages" class="messages"></div>
+      <div class="composer">
+        <input id="input" class="input" placeholder="Type a message…" maxlength="2000" />
+        <button id="sendBtn" class="btn">Send</button>
+      </div>
+      <div id="error" class="error"></div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('loopin_token');
+    if (!token) window.location.href = '/login';
+
+    const me = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+    const myId = me._id || me.id;
+    const otherId = (location.pathname.split('/chat/')[1] || '').trim();
+
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('sendBtn');
+
+    document.getElementById('profileLink').href = otherId ? ('/u/' + encodeURIComponent(otherId)) : '/friends';
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+    function clearError() {
+      const el = document.getElementById('error');
+      el.style.display = 'none';
+    }
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+    function render(messages) {
+      if (!messages || messages.length === 0) {
+        messagesEl.innerHTML = '<div style="color:var(--text-light); font-weight:900; text-align:center; padding: 22px;">No messages yet. Say hi!</div>';
+        return;
+      }
+      messagesEl.innerHTML = messages.map(m => {
+        const mine = myId && (String(m.from) === String(myId) || (m.from && m.from._id && String(m.from._id) === String(myId)));
+        const cls = mine ? 'bubble me' : 'bubble them';
+        const time = m.createdAt ? new Date(m.createdAt).toLocaleString() : '';
+        return `<div class="${cls}">
+          <div>${escapeHtml(m.content || '')}</div>
+          <div class="time">${escapeHtml(time)}</div>
+        </div>`;
+      }).join('');
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function loadFriendHeader() {
+      try {
+        if (!otherId) return;
+        const res = await fetch(`/api/users/friend-profile?userId=${encodeURIComponent(otherId)}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('friendName').textContent = data.data.username ? ('Chat with ' + data.data.username) : 'Chat';
+          const avatarEl = document.getElementById('friendAvatar');
+          const a = data.data.avatar;
+          if (a && (/^https?:\/\//i.test(a) || String(a).startsWith('/uploads/'))) {
+            const safe = String(a).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            avatarEl.innerHTML = `<img src="${safe}" alt="" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+          } else {
+            avatarEl.textContent = a || '💬';
+          }
+        }
+      } catch (e) { }
+    }
+
+    async function loadThread() {
+      clearError();
+      try {
+        if (!otherId) {
+          showError('Missing friend id.');
+          return;
+        }
+        const res = await fetch(`/api/messages/thread/${encodeURIComponent(otherId)}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (!data.success) {
+          showError(data.message || 'Failed to load messages.');
+          render([]);
+          return;
+        }
+        render(data.data.messages || []);
+      } catch (e) {
+        showError('Error loading messages.');
+      }
+    }
+
+    async function send() {
+      clearError();
+      const content = inputEl.value.trim();
+      if (!content) return;
+      sendBtn.disabled = true;
+      try {
+        const res = await fetch(`/api/messages/thread/${encodeURIComponent(otherId)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          showError(data.message || 'Failed to send.');
+          return;
+        }
+        inputEl.value = '';
+        await loadThread();
+      } catch (e) {
+        showError('Error sending message.');
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+
+    sendBtn.addEventListener('click', send);
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
+    });
+
+    loadFriendHeader();
+    loadThread();
+    // light polling so you can see replies without websocket
+    setInterval(loadThread, 3500);
+  </script>
+</body>
+
+</html>
