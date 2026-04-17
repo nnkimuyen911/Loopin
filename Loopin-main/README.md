@@ -1,2 +1,0 @@
-# Loopin
-day la loopin
