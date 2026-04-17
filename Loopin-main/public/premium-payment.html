@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopin Premium Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/premium-payment.css">
+</head>
+<body class="premium-payment-page">
+    <main class="pp-shell" id="paymentShell" aria-live="polite">
+        <section class="pp-content">
+            <header class="pp-header">
+                <p class="pp-kicker">Loopin Premium</p>
+                <h1 class="pp-title">Choose your payment method</h1>
+                <p class="pp-subtitle">Pick your preferred checkout option to start Premium and unlock roadmap planning, smart reminders, and deeper habit insights.</p>
+            </header>
+
+            <section class="pp-methods" id="paymentMethods" aria-label="Payment method options"></section>
+
+            <section class="pp-confirm" id="confirmSection" aria-label="Confirm subscription">
+                <div class="pp-confirm-head">
+                    <h2 class="pp-confirm-title">Confirm Subscription</h2>
+                    <span class="pp-price-pill">$1.99/month</span>
+                </div>
+                <p class="pp-confirm-copy">Your plan renews monthly. You can manage your subscription from settings anytime.</p>
+                <p class="pp-confirm-method" id="confirmMethod">Select a payment method to continue.</p>
+                <div class="pp-actions">
+                    <button type="button" class="pp-btn pp-btn-primary" id="confirmBtn" disabled>
+                        <span class="pp-btn-spinner" aria-hidden="true"></span>
+                        <span id="confirmBtnLabel">Confirm Subscription</span>
+                    </button>
+                    <button type="button" class="pp-btn pp-btn-secondary" id="backBtn">Back</button>
+                </div>
+                <p class="pp-status" id="paymentStatus"></p>
+            </section>
+
+            <section class="pp-success" id="successSection" aria-live="polite" aria-hidden="true">
+                <div class="pp-success-check" aria-hidden="true">✓</div>
+                <h2 class="pp-success-title">You're now Premium 🎉</h2>
+                <p class="pp-success-subtitle">Your advanced features are unlocked</p>
+            </section>
+        </section>
+    </main>
+
+    <script src="/lib/premium-service.js"></script>
+    <script src="/lib/subscription-store.js"></script>
+    <script src="/lib/premium-payment.js"></script>
+</body>
+</html>

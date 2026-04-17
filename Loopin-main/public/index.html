@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopin - Build Habits That Stick!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        :root {
+            --pastel-green: #A8E6CF;
+            --pastel-green-dark: #7DC4A5;
+            --pastel-blue: #A8D8EA;
+            --pastel-blue-dark: #7BB8CC;
+            --pastel-yellow: #FFEAA7;
+            --pastel-pink: #FFB8B8;
+            --pastel-purple: #DDA0DD;
+            --white: #FFFFFF;
+            --text-dark: #4A4A4A;
+            --text-light: #7A7A7A;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .loopin-logo {
+            width: 78px;
+            height: 78px;
+            margin: 0 auto 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 10px 24px rgba(109, 149, 129, 0.24));
+        }
+
+        .loopin-logo svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+        }
+
+        .loopin-logo .loop {
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: landingDrawLoop 3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+        }
+
+        .loopin-logo .dot {
+            offset-path: path("M100 30 A70 70 0 1 1 99.9 30");
+            animation: landingMoveDot 3s linear infinite;
+        }
+
+        .loopin-logo .glow {
+            filter: drop-shadow(0 0 14px rgba(255, 120, 60, 0.45));
+        }
+
+        .loopin-logo .flame {
+            transform-origin: center;
+            animation: landingFlameFloat 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-outer {
+            filter: blur(0.4px) drop-shadow(0 0 14px rgba(255, 100, 40, 0.52));
+            animation: landingFlameWobble 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-inner {
+            opacity: 0.95;
+            animation: landingFlameInner 1.3s ease-in-out infinite;
+        }
+
+        @keyframes landingDrawLoop {
+            0% { stroke-dashoffset: 600; opacity: 0; }
+            20% { opacity: 1; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -600; opacity: 0; }
+        }
+
+        @keyframes landingMoveDot {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+
+        @keyframes landingFlameFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        @keyframes landingFlameWobble {
+            0%, 100% { transform: scale(1, 1) skewX(0deg); }
+            50% { transform: scale(1.05, 0.95) skewX(-2deg); }
+        }
+
+        @keyframes landingFlameInner {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08, 0.92); }
+        }
+
+        .app-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pastel-green-dark) 0%, var(--pastel-blue-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .tagline {
+            font-size: 24px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 50px;
+        }
+
+        .features {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 30px;
+            width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card:nth-child(1) { border-top: 5px solid var(--pastel-green); }
+        .feature-card:nth-child(2) { border-top: 5px solid var(--pastel-blue); }
+        .feature-card:nth-child(3) { border-top: 5px solid var(--pastel-pink); }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+            color: #2D6A4F;
+            border: none;
+            box-shadow: 0 6px 0 var(--pastel-green-dark), 0 10px 20px rgba(168, 230, 207, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--pastel-green-dark), 0 14px 25px rgba(168, 230, 207, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--pastel-green-dark);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 3px solid var(--pastel-blue);
+            box-shadow: 0 6px 0 var(--pastel-blue-dark), 0 10px 20px rgba(168, 216, 234, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--pastel-blue-dark), 0 14px 25px rgba(168, 216, 234, 0.4);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--pastel-blue-dark);
+        }
+
+        .mascots {
+            font-size: 50px;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .app-title {
+                font-size: 42px;
+            }
+            .tagline {
+                font-size: 18px;
+            }
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loopin-logo" aria-label="Loopin logo">
+            <svg viewBox="0 0 200 200" role="img" aria-hidden="true">
+                <defs>
+                    <linearGradient id="landingLoopGradient">
+                        <stop offset="0%" stop-color="#FFA85C"/>
+                        <stop offset="50%" stop-color="#CE65FF"/>
+                        <stop offset="100%" stop-color="#5ED4A2"/>
+                    </linearGradient>
+                    <radialGradient id="landingFlameOuterGrad" cx="50%" cy="65%" r="60%">
+                        <stop offset="0%" stop-color="#FFF3B0"/>
+                        <stop offset="40%" stop-color="#FFA85C"/>
+                        <stop offset="100%" stop-color="#FF3D00"/>
+                    </radialGradient>
+                    <radialGradient id="landingFlameInnerGrad" cx="50%" cy="70%" r="50%">
+                        <stop offset="0%" stop-color="#FFFFFF"/>
+                        <stop offset="100%" stop-color="#FFB347"/>
+                    </radialGradient>
+                </defs>
+
+                <path d="M100 30 A70 70 0 1 1 99.9 30" fill="none" stroke="url(#landingLoopGradient)" stroke-width="12" stroke-linecap="round" class="loop glow"/>
+                <circle r="4" fill="#FFD166" class="dot glow"></circle>
+
+                <g class="flame">
+                    <path d="M100 120 C82 100, 85 78, 98 60 C106 72, 118 85, 112 102 C109 112, 103 118, 100 120 Z" fill="url(#landingFlameOuterGrad)" class="flame-outer"/>
+                    <path d="M100 110 C90 95, 96 80, 100 70 C105 80, 108 92, 102 108 Z" fill="url(#landingFlameInnerGrad)" class="flame-inner"/>
+                </g>
+            </svg>
+        </div>
+        <h1 class="app-title">Loopin</h1>
+        <p class="tagline">Stay in the Loop!</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Track Daily</h3>
+                <p class="feature-text">Log your habits every day with one tap</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔥</div>
+                <h3 class="feature-title">Build Streaks</h3>
+                <p class="feature-text">Watch your consistency grow over time</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Reach Goals</h3>
+                <p class="feature-text">Achieve your personal milestones</p>
+            </div>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="/signup" class="btn btn-primary">Get Started</a>
+            <a href="/login" class="btn btn-secondary">I Have an Account</a>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is already logged in
+        const token = localStorage.getItem('loopin_token');
+        if (token) {
+            window.location.href = '/home';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,3320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopin - Habit Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/premium-badge.css">
+    <link rel="stylesheet" href="/lib/premium-modal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #fff9f0 100%);
+            min-height: 100vh;
+            padding: 14px 20px 20px;
+            color: #4A4A4A;
+            line-height: 1.5;
+        }
+
+        :root {
+            --pastel-green: #A8E6CF;
+            --pastel-green-dark: #7DC4A5;
+            --pastel-blue: #ADD7E6;
+            --pastel-blue-dark: #7BB8CC;
+            --pastel-yellow: #FFFBDF;
+            --pastel-yellow-dark: #F0D78A;
+            --pastel-pink: #F0B3C0;
+            --pastel-pink-dark: #E89A9A;
+            --pastel-purple: #DDA0DD;
+            --white: #FFFFFF;
+            --ivory-white: #FCEEDC;
+            --soft-gray: #F5F5F5;
+            --text-dark: #4A4A4A;
+            --text-light: #7A7A7A;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        p {
+            font-size: 15px;
+            font-weight: 400;
+            color: #6B6B6B;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 700;
+            width: calc(100% + 40px);
+            margin: -14px -20px 16px;
+            background: #FFFFFF;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            font-family: 'Nunito', 'Poppins', 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .nav-brand {
+            position: relative;
+            font-size: 30px;
+            font-weight: 700;
+            color: #d9a0ea;
+            letter-spacing: 0.09em;
+            justify-self: center;
+            line-height: 1;
+            background: linear-gradient(90deg, #FFB6C1 0%, #E6A8FF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 1px 8px rgba(255, 182, 193, 0.32);
+            font-family: 'Nunito', 'Poppins', 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .nav-brand::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 132%;
+            height: 150%;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.26) 0%, rgba(230, 168, 255, 0.14) 45%, rgba(230, 168, 255, 0) 75%);
+            filter: blur(8px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--pastel-pink) 0%, var(--pastel-purple) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            overflow: hidden;
+            line-height: 1;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        /* Username + Premium badge in one horizontal row */
+        .user-name-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .user-greeting {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.05);
+            justify-self: end;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.8);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 14px 12px 8px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 152px;
+            height: 26px;
+            bottom: -12px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(125, 196, 165, 0.18) 0%, rgba(125, 196, 165, 0) 74%);
+            filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .loopin-logo {
+            width: 142px;
+            height: 142px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            filter: drop-shadow(0 12px 24px rgba(109, 149, 129, 0.24));
+        }
+
+        .loopin-logo svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+        }
+
+        .loopin-logo .loop {
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: loopinDrawLoop 3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+        }
+
+        .loopin-logo .dot {
+            offset-path: path("M100 30 A70 70 0 1 1 99.9 30");
+            animation: loopinMoveDot 3s linear infinite;
+        }
+
+        .loopin-logo .glow {
+            filter: drop-shadow(0 0 14px rgba(255,120,60,0.5));
+        }
+
+        .loopin-logo .flame {
+            transform-origin: center;
+            animation: loopinFlameFloat 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-outer {
+            filter: blur(0.4px) drop-shadow(0 0 16px rgba(255,100,40,0.6));
+            animation: loopinFlameWobble 1.6s ease-in-out infinite;
+        }
+
+        .loopin-logo .flame-inner {
+            opacity: 0.95;
+            animation: loopinFlameInner 1.3s ease-in-out infinite;
+        }
+
+        @keyframes loopinDrawLoop {
+            0% { stroke-dashoffset: 600; opacity: 0; }
+            20% { opacity: 1; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -600; opacity: 0; }
+        }
+
+        @keyframes loopinMoveDot {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+
+        @keyframes loopinFlameFloat {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        @keyframes loopinFlameWobble {
+            0%,100% { transform: scale(1,1) skewX(0deg); }
+            50% { transform: scale(1.05,0.95) skewX(-2deg); }
+        }
+
+        @keyframes loopinFlameInner {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.08,0.92); }
+        }
+
+        .brand-title-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 120px;
+            background: var(--white);
+            border-radius: 18px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card:nth-child(1) {
+            border-bottom: 4px solid var(--pastel-green);
+        }
+
+        .stat-card:nth-child(2) {
+            border-bottom: 4px solid var(--pastel-blue);
+        }
+
+        .stat-card:nth-child(3) {
+            border-bottom: 4px solid var(--pastel-yellow);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Update this specific class in your <style> tag */
+        .motivation-banner {
+            background: linear-gradient(
+                135deg,
+                #F0B3C0 0%,
+                #FFFBDF 100%
+            );
+            border-radius: 20px;
+            padding: 25px 35px;
+            margin-top: 30px;
+            /* Added this to push it down from the buttons */
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .motivation-banner:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+        }
+
+        .motivation-mascot {
+            font-size: 50px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .motivation-text {
+            color: #4A4A4A;
+        }
+
+        .motivation-text h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .motivation-text p {
+            font-size: 14px;
+            color: #9A9A9A;
+            font-weight: 500;
+        }
+
+        .add-habit-section {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            border: 3px solid var(--pastel-green);
+        }
+
+        .habit-smart-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 30%);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .right-assist-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .smart-learning-card {
+            background: #ffebf7;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(6px);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            color: #4A4A4A;
+        }
+
+        .pet-profile-card {
+            background: #FCEEDC;
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pet-profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .pet-profile-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .pet-profile-title h4 {
+            margin: 0;
+            color: #49306f;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .pet-profile-level {
+            background: #F0B3C0;
+            color: #FFFFFF;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        .pet-profile-stage {
+            color: #7A7A7A;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .pet-profile-avatar-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 2px 0 10px;
+            min-height: 74px;
+        }
+
+        .pet-profile-avatar {
+            display: block;
+            width: 100%;
+            max-width: 120px;
+            user-select: none;
+            margin: 0 auto;
+        }
+
+        .pet-profile-xp-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            color: #5d4a7b;
+            margin-bottom: 6px;
+        }
+
+        .pet-profile-xp-track {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: #ADD7E6;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(90, 63, 129, 0.1);
+        }
+
+        .pet-profile-xp-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #ff9cc7, #ffd779);
+            transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .smart-learning-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+        }
+
+        .smart-learning-icon {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .smart-learning-card h3 {
+            margin: 0 0 8px;
+            color: #3A3A3A;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .smart-learning-card p {
+            margin: 0 0 18px;
+            color: #6F6F6F;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.55;
+        }
+
+        .smart-learning-start {
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            padding: 14px 28px;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            font-size: 15px;
+            text-transform: none;
+            color: #000000;
+            background: #ffebf7;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .smart-learning-start:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08), 0 0 12px rgba(240,179,192,0.4);
+        }
+
+        .smart-learning-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.45);
+            z-index: 1400;
+            padding: 20px;
+        }
+
+        .smart-learning-modal.open {
+            display: flex;
+        }
+
+        .smart-learning-modal-card {
+            width: min(860px, 96vw);
+            max-height: 88vh;
+            overflow: auto;
+            background: linear-gradient(180deg, #FCEEDC 0%, #FFFBDF 100%);
+            border-radius: 22px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+            padding: 24px;
+            position: relative;
+        }
+
+        .smart-learning-close {
+            border: none;
+            background: #FFFFFF;
+            color: #334155;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            cursor: pointer;
+            font-weight: 700;
+            position: absolute;
+            top: 18px;
+            right: 18px;
+        }
+
+        .smart-learning-modal-title {
+            margin: 0;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: #3A3A3A;
+            padding-right: 44px;
+        }
+
+        .sl-step {
+            display: none;
+            margin-top: 18px;
+        }
+
+        .sl-step.active {
+            display: block;
+        }
+
+        .sl-field {
+            margin-bottom: 14px;
+        }
+
+        .sl-field label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .sl-input,
+        .sl-select {
+            width: 100%;
+            background: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 15px;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+        }
+
+        .sl-input:focus,
+        .sl-select:focus,
+        .sl-habit-meta input:focus {
+            outline: none;
+            border: 1px solid #ADD7E6;
+            box-shadow: 0 0 0 3px rgba(173,215,230,0.2);
+        }
+
+        .sl-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .sl-generate-btn,
+        .sl-upgrade-btn,
+        .sl-add-btn,
+        .sl-cancel-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sl-generate-btn {
+            background: linear-gradient(135deg, #F0B3C0, #ADD7E6);
+            color: #FFFFFF;
+            font-family: 'Poppins', 'Quicksand', sans-serif;
+            font-weight: 600;
+            padding: 12px 24px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .sl-upgrade-btn {
+            background: linear-gradient(135deg, #F0B3C0, #ADD7E6);
+            color: #FFFFFF;
+            font-family: 'Poppins', 'Quicksand', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .sl-add-btn {
+            background: linear-gradient(135deg, #ADD7E6, #F0B3C0);
+            color: #FFFFFF;
+            font-family: 'Poppins', 'Quicksand', sans-serif;
+            font-weight: 600;
+            padding: 14px 28px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        }
+
+        .sl-add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .sl-cancel-btn {
+            background: #FFFFFF;
+            color: #7A7A7A;
+            border: 1px solid #E5E5E5;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        .sl-loading-box {
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            padding: 18px;
+            color: #4c1d95;
+            font-weight: 700;
+            animation: slPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes slPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+
+        .sl-phase {
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+            transition: 0.2s;
+        }
+
+        .sl-phase:hover {
+            transform: translateY(-2px);
+        }
+
+        .sl-phase h4 {
+            margin: 0 0 6px;
+            color: #4A4A4A;
+            font-weight: 600;
+        }
+
+        .sl-phase p,
+        .sl-habit-desc {
+            margin: 0;
+            color: #7A7A7A;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .sl-habit-desc {
+            margin-top: 6px;
+        }
+
+        .sl-habit-row {
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            background: #fff;
+            padding: 10px;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .sl-habit-row:hover {
+            transform: translateY(-2px);
+        }
+
+        .sl-habit-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #4A4A4A;
+        }
+
+        .sl-habit-checkbox {
+            accent-color: #F0B3C0;
+        }
+
+        .sl-habit-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .sl-habit-meta label {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sl-habit-meta input {
+            width: 100%;
+            border: 1px solid #EAEAEA;
+            border-radius: 12px;
+            padding: 8px;
+            background: #FFFFFF;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+        }
+
+        .sl-result-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 26px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 22px;
+            border: 3px solid var(--soft-gray);
+            border-radius: 18px;
+            font-size: 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 500;
+            color: #4A4A4A;
+            transition: all 0.3s ease;
+            background: #F8F8F8;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border: 1px solid #ADD7E6;
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(173,215,230,0.2);
+        }
+
+        .input-field::placeholder {
+            font-size: 13px;
+            font-weight: 400;
+            color: #A8A8A8;
+        }
+
+        .icon-picker {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .icon-option {
+            width: 45px;
+            height: 45px;
+            border: 3px solid var(--soft-gray);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .icon-option:hover {
+            border-color: var(--pastel-green);
+            transform: scale(1.1);
+        }
+
+        .icon-option.selected {
+            border-color: var(--pastel-green);
+            background: var(--pastel-green);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+            color: #2D6A4F;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: none;
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 0 var(--pastel-green-dark), 0 10px 20px rgba(168, 230, 207, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--pastel-green-dark), 0 14px 25px rgba(168, 230, 207, 0.5);
+        }
+
+        .btn-add:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--pastel-green-dark);
+        }
+
+        .btn-add:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .habits-section {
+            margin-bottom: 30px;
+        }
+
+        .habits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .habits-count {
+            background: var(--pastel-yellow);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #8B7355;
+        }
+
+        .habits-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .habit-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            border-left: 6px solid var(--pastel-blue);
+        }
+
+        .habit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .habit-card.color-blue {
+            border-left-color: var(--pastel-blue);
+        }
+
+        .habit-card.color-pink {
+            border-left-color: var(--pastel-pink);
+        }
+
+        .habit-card.color-yellow {
+            border-left-color: var(--pastel-yellow);
+        }
+
+        .habit-card.color-purple {
+            border-left-color: var(--pastel-purple);
+        }
+
+        .habit-card.color-green {
+            border-left-color: var(--pastel-green);
+        }
+
+        .habit-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .habit-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-blue-dark) 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .habit-card.color-pink .habit-icon {
+            background: linear-gradient(135deg, var(--pastel-pink) 0%, var(--pastel-pink-dark) 100%);
+        }
+
+        .habit-card.color-yellow .habit-icon {
+            background: linear-gradient(135deg, var(--pastel-yellow) 0%, var(--pastel-yellow-dark) 100%);
+        }
+
+        .habit-card.color-purple .habit-icon {
+            background: linear-gradient(135deg, var(--pastel-purple) 0%, #C589C5 100%);
+        }
+
+        .habit-card.color-green .habit-icon {
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+        }
+
+        .habit-details h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .habit-goal {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .habit-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .streak {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            padding: 10px 18px;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .streak-fire {
+            font-size: 22px;
+            transform-origin: 50% 80%;
+        }
+
+        .streak-count {
+            font-size: 18px;
+            font-weight: 800;
+            color: #E65100;
+        }
+
+        .streak-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #FF8F00;
+        }
+
+        /* Flame burst effect on page visit */
+        @keyframes flameFlicker {
+            0% {
+                transform: translateY(0) scale(1) rotate(-2deg);
+                filter: drop-shadow(0 0 0 rgba(255, 140, 0, 0));
+            }
+
+            25% {
+                transform: translateY(-1px) scale(1.08) rotate(2deg);
+                filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.45));
+            }
+
+            50% {
+                transform: translateY(-2px) scale(1.15) rotate(-1deg);
+                filter: drop-shadow(0 6px 14px rgba(255, 80, 0, 0.55));
+            }
+
+            75% {
+                transform: translateY(-1px) scale(1.08) rotate(2deg);
+                filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.45));
+            }
+
+            100% {
+                transform: translateY(0) scale(1) rotate(-2deg);
+                filter: drop-shadow(0 0 0 rgba(255, 140, 0, 0));
+            }
+        }
+
+        @keyframes streakGlowPulse {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 140, 0, 0);
+                transform: translateY(0);
+            }
+
+            25% {
+                box-shadow: 0 10px 22px rgba(255, 180, 80, 0.35);
+                transform: translateY(-1px);
+            }
+
+            50% {
+                box-shadow: 0 14px 30px rgba(255, 120, 0, 0.35);
+                transform: translateY(-2px);
+            }
+
+            100% {
+                box-shadow: 0 0 0 rgba(255, 140, 0, 0);
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes emberRise {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 8px) scale(0.8);
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -42px) scale(1.35);
+            }
+        }
+
+        .streak.flame-burst {
+            animation: streakGlowPulse 1.1s ease-in-out 0s 3;
+        }
+
+        .streak.flame-burst .streak-fire {
+            animation: flameFlicker 0.22s ease-in-out 0s 14;
+        }
+
+        .streak.flame-burst::after {
+            content: "";
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 240, 200, 1) 0%, rgba(255, 170, 60, 0.9) 45%, rgba(255, 80, 0, 0) 70%);
+            animation: emberRise 1.1s ease-out 0s 3;
+            pointer-events: none;
+        }
+
+        .streak.flame-burst::before {
+            content: "";
+            position: absolute;
+            left: 38px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 240, 200, 1) 0%, rgba(255, 170, 60, 0.85) 45%, rgba(255, 80, 0, 0) 70%);
+            animation: emberRise 1.25s ease-out 0.08s 3;
+            pointer-events: none;
+        }
+
+        .habit-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-checkin {
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-green-dark) 100%);
+            color: #2D6A4F;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 0 var(--pastel-green-dark), 0 8px 20px rgba(168, 230, 207, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-checkin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 var(--pastel-green-dark), 0 12px 25px rgba(168, 230, 207, 0.5);
+        }
+
+        .btn-checkin:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--pastel-green-dark);
+        }
+
+        .btn-checkin.checked {
+            background: linear-gradient(135deg, #90EE90 0%, #68D968 100%);
+            box-shadow: 0 3px 0 #4CAF50;
+            color: #2E7D32;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+        }
+
+        .btn-delete:hover {
+            background: var(--pastel-pink);
+            color: #CC4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            background: var(--white);
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .loading-spinner {
+            font-size: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            font-weight: 600;
+            border-left: 5px solid var(--pastel-green);
+        }
+
+        .toast.error {
+            border-left-color: var(--pastel-pink);
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .habit-limit-note {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+            min-height: 18px;
+        }
+
+        .habit-limit-note.error {
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        .habit-limit-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            z-index: 1300;
+        }
+
+        .habit-limit-modal.open {
+            display: flex;
+        }
+
+        .habit-limit-modal-card {
+            width: 100%;
+            max-width: 460px;
+            background: #fff;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 18px 50px rgba(15, 23, 42, 0.24);
+            text-align: left;
+        }
+
+        .habit-limit-modal-card h3 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            color: #0f172a;
+        }
+
+        .habit-limit-modal-card p {
+            margin: 0 0 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .habit-limit-benefits {
+            margin: 0 0 18px;
+            padding-left: 20px;
+            color: #1e293b;
+        }
+
+        .habit-limit-benefits li {
+            margin: 6px 0;
+        }
+
+        .habit-limit-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .habit-limit-upgrade,
+        .habit-limit-close {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .habit-limit-upgrade {
+            background: linear-gradient(90deg, #f97316, #ef4444);
+            color: #fff;
+        }
+
+        .habit-limit-close {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .footer-hearts {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .app-title {
+                font-size: 36px;
+            }
+
+            .header-inner {
+                grid-template-columns: 1fr auto;
+                grid-template-areas:
+                    "brand brand"
+                    "user logout";
+                gap: 10px 12px;
+                padding: 12px;
+            }
+
+            .nav-user {
+                grid-area: user;
+            }
+
+            .nav-brand {
+                grid-area: brand;
+                font-size: 22px;
+                letter-spacing: 0.08em;
+            }
+
+            .btn-logout {
+                grid-area: logout;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .habit-smart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .smart-learning-card {
+                position: static;
+            }
+
+            .habit-card {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .habit-info {
+                flex-direction: column;
+            }
+
+            .habit-stats {
+                flex-direction: column;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+        }
+
+        .user-profile-clickable {
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--white);
+            padding: 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+
+
+        .nav-item.nav-leaderboard {
+            border-bottom: 4px solid var(--pastel-purple);
+        }
+
+        .nav-item.nav-friends {
+            border-bottom: 4px solid var(--pastel-pink);
+        }
+
+        .nav-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+        }
+
+        /* Dashboard Premium upsell card (shown only for non-premium users) */
+        .premium-upsell-card {
+            margin-top: 22px;
+            margin-bottom: 28px;
+            border-radius: 24px;
+            padding: 24px;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 14px 34px rgba(102, 126, 234, 0.28);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            cursor: pointer;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .premium-upsell-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.35);
+        }
+
+        .premium-upsell-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .premium-upsell-subtitle {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .premium-upsell-btn {
+            border: none;
+            border-radius: 14px;
+            padding: 11px 16px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #5a4b1d;
+            background: linear-gradient(90deg, #FFEAA7 0%, #FFD56B 100%);
+            cursor: pointer;
+        }
+
+        .premium-upsell-icon {
+            font-size: 56px;
+            line-height: 1;
+            opacity: 0.95;
+            user-select: none;
+        }
+
+
+        @media (max-width: 600px) {
+            .nav-menu {
+                flex-direction: row;
+            }
+
+            .nav-item {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+
+        .user-profile-clickable:hover {
+            background-color: rgba(168, 230, 207, 0.1);
+            transform: scale(1.02);
+        }
+
+        .user-profile-clickable:active {
+            transform: scale(0.98);
+        }
+
+        /* Premium overlay/modal */
+        .premium-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(20, 18, 37, 0.46);
+            backdrop-filter: blur(4px);
+        }
+
+        .premium-modal-overlay.open {
+            display: flex;
+            animation: premiumFadeIn .24s ease;
+        }
+
+        .premium-modal {
+            width: min(680px, 100%);
+            border-radius: 26px;
+            overflow: hidden;
+            color: white;
+            background: linear-gradient(135deg, #7C5CFF 0%, #D46AF5 46%, #7CC7FF 100%);
+            box-shadow: 0 24px 70px rgba(73, 52, 140, .35);
+            animation: premiumScaleIn .28s cubic-bezier(.2, .8, .2, 1);
+            transform-origin: center;
+        }
+
+        .premium-modal-inner {
+            position: relative;
+            padding: 28px 26px 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .08) 0%, rgba(255, 255, 255, .03) 100%);
+        }
+
+        .premium-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .18);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease;
+        }
+
+        .premium-close:hover {
+            background: rgba(255, 255, 255, .28);
+            transform: scale(1.05);
+        }
+
+        .premium-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            padding-right: 44px;
+        }
+
+        .premium-subtitle {
+            font-size: 15px;
+            font-weight: 600;
+            opacity: .95;
+            margin-bottom: 20px;
+        }
+
+        .premium-price {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, .2);
+            border: 1px solid rgba(255, 255, 255, .26);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .premium-features {
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+
+        .premium-features h4 {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .premium-features ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .premium-features li {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .premium-features li::before {
+            content: "✨";
+            line-height: 1;
+        }
+
+        .premium-cta {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: .01em;
+            line-height: 1.25;
+            color: #3e2d73;
+            cursor: pointer;
+            background: linear-gradient(90deg, #FFEAA7 0%, #FFD670 50%, #FFC1F2 100%);
+            box-shadow: 0 8px 18px rgba(65, 39, 130, .25);
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+        }
+
+        .premium-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px rgba(65, 39, 130, .32);
+            filter: saturate(1.02);
+        }
+
+        .premium-cta:active {
+            transform: translateY(0);
+            box-shadow: 0 7px 16px rgba(65, 39, 130, .24);
+        }
+
+        .premium-later {
+            margin-top: 10px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            color: rgba(255, 255, 255, .68);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .01em;
+            line-height: 1.3;
+            cursor: pointer;
+            padding: 8px 0;
+            transition: color .18s ease, opacity .18s ease;
+        }
+
+        .premium-later:hover {
+            color: rgba(255, 255, 255, .84);
+            text-decoration: underline;
+        }
+
+        .premium-float {
+            position: absolute;
+            pointer-events: none;
+            opacity: .65;
+            font-size: 20px;
+            animation: premiumFloat 3.4s ease-in-out infinite;
+        }
+
+        .premium-float.f1 { top: 20px; left: 22px; }
+        .premium-float.f2 { top: 52px; right: 56px; animation-delay: .6s; }
+        .premium-float.f3 { bottom: 20px; right: 18px; animation-delay: 1.1s; }
+
+        @keyframes premiumFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes premiumScaleIn {
+            from { opacity: 0; transform: scale(.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes premiumFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        body.premium-route-leaving {
+            animation: premiumRouteLeave .22s cubic-bezier(.22, .8, .2, 1) forwards;
+        }
+
+        body.calendar-route-leaving {
+            animation: premiumRouteLeave .22s cubic-bezier(.22, .8, .2, 1) forwards;
+        }
+
+        @keyframes premiumRouteLeave {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: .92; transform: translateY(6px); }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                margin-bottom: 16px;
+                padding: 10px 10px 4px;
+            }
+
+            .loopin-logo {
+                width: 116px;
+                height: 116px;
+            }
+
+            .logo::after {
+                width: 126px;
+            }
+
+            .premium-modal-overlay {
+                padding: 0;
+            }
+
+            .premium-modal {
+                width: 100%;
+                height: 100%;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
+
+            .premium-modal-inner {
+                min-height: 100%;
+                padding-top: 24px;
+            }
+
+            .premium-title {
+                font-size: 28px;
+            }
+
+            .premium-upsell-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .premium-upsell-icon {
+                font-size: 48px;
+            }
+        }
+
+        .fire-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            z-index: 10000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fire-active {
+            display: flex;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="welcomeFireOverlay" class="fire-overlay">
+        <div style="font-size: 72px;">🔥</div>
+        <div style="font-size: 20px; font-weight: 800; color: #E65100; margin-top: 10px;">Welcome back!</div>
+    </div>
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="nav-user" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+                <div class="user-avatar" id="homeUserAvatar">🐱</div>
+                <div>
+                    <div class="user-name-row">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <!-- Premium badge: hidden by default, shown only when user.isPremium === true -->
+                        <span id="premiumBadge" class="premium-badge" style="display:none"><span class="premium-badge-icon" aria-hidden="true">👑</span>Premium</span>
+                    </div>
+                    <div class="user-greeting" id="homeGreeting">Let's build habits! 🌟</div>
+                </div>
+            </div>
+            <div class="nav-brand" aria-hidden="true">LOOPIN</div>
+            <button class="btn-logout" id="logoutBtn">Logout 👋</button>
+        </div>
+    </header>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="loopin-logo" aria-label="Loopin logo">
+                    <svg viewBox="0 0 200 200" role="img" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="homeLoopGradient">
+                                <stop offset="0%" stop-color="#FFA85C"/>
+                                <stop offset="50%" stop-color="#CE65FF"/>
+                                <stop offset="100%" stop-color="#5ED4A2"/>
+                            </linearGradient>
+
+                            <radialGradient id="homeFlameOuterGrad" cx="50%" cy="65%" r="60%">
+                                <stop offset="0%" stop-color="#FFF3B0"/>
+                                <stop offset="40%" stop-color="#FFA85C"/>
+                                <stop offset="100%" stop-color="#FF3D00"/>
+                            </radialGradient>
+
+                            <radialGradient id="homeFlameInnerGrad" cx="50%" cy="70%" r="50%">
+                                <stop offset="0%" stop-color="#FFFFFF"/>
+                                <stop offset="100%" stop-color="#FFB347"/>
+                            </radialGradient>
+                        </defs>
+
+                        <path
+                            d="M100 30 A70 70 0 1 1 99.9 30"
+                            fill="none"
+                            stroke="url(#homeLoopGradient)"
+                            stroke-width="12"
+                            stroke-linecap="round"
+                            class="loop glow"
+                        />
+
+                        <circle r="4" fill="#FFD166" class="dot glow"></circle>
+
+                        <g class="flame">
+                            <path
+                                d="M100 120
+                                   C82 100, 85 78, 98 60
+                                   C106 72, 118 85, 112 102
+                                   C109 112, 103 118, 100 120 Z"
+                                fill="url(#homeFlameOuterGrad)"
+                                class="flame-outer"
+                            />
+
+                            <path
+                                d="M100 110
+                                   C90 95, 96 80, 100 70
+                                   C105 80, 108 92, 102 108 Z"
+                                fill="url(#homeFlameInnerGrad)"
+                                class="flame-inner"
+                            />
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="brand-title-hidden">Loopin</h1>
+            </div>
+        </header>
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="totalHabits">0</div>
+                <div class="stat-label">Total Habits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedToday">0</div>
+                <div class="stat-label">Done Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="longestStreak">0 🔥</div>
+                <div class="stat-label">Best Streak</div>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <a href="/ranking" class="nav-item nav-leaderboard">
+                <span style="font-size: 20px;">🏆</span> Leaderboard
+            </a>
+            <a href="/friends" class="nav-item nav-friends">
+                <span style="font-size: 20px;">👥</span> Friends
+            </a>
+        </div>
+
+        <section id="premiumUpsellCard" class="premium-upsell-card" style="display:none;" aria-label="Premium Upgrade">
+            <div>
+                <h3 class="premium-upsell-title">Upgrade to Premium</h3>
+                <p class="premium-upsell-subtitle">Unlock smarter habit building with Loopin — only $1.99/month.</p>
+                <button type="button" class="premium-upsell-btn">See Premium Features</button>
+            </div>
+            <div class="premium-upsell-icon">💎</div>
+        </section>
+
+        <div class="motivation-banner">
+            <div class="motivation-mascot">🌟</div>
+            <div class="motivation-text">
+                <h3 id="motivationTitle">You're doing amazing!</h3>
+                <p id="motivationText">Keep up the great work — consistency is key! 💪</p>
+            </div>
+        </div>
+        <div class="habit-smart-layout">
+        <section class="add-habit-section">
+            <h2 class="section-title"><span class="section-icon">✨</span> Add New Habit</h2>
+            <form id="addHabitForm">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <label class="input-label">Habit Name</label>
+                        <input type="text" class="input-field" id="habitName" placeholder="e.g., Morning Meditation 🧘"
+                            required>
+                    </div>
+                    <div class="input-wrapper">
+                        <label class="input-label">Daily Goal</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="number" class="input-field" id="habitGoalValue" placeholder="Enter value"
+                                min="1">
+                            <select class="input-field" id="habitGoalUnit">
+                                <option value="minutes">Minutes</option>
+                                <option value="hours">Hours</option>
+                                <option value="seconds">Seconds</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-wrapper" style="margin-top: 15px;">
+                    <label class="input-label">Choose an Icon</label>
+                    <div class="icon-picker" id="iconPicker">
+                        <div class="icon-option selected" data-icon="✨">✨</div>
+                        <div class="icon-option" data-icon="📚">📚</div>
+                        <div class="icon-option" data-icon="💪">💪</div>
+                        <div class="icon-option" data-icon="🧘">🧘</div>
+                        <div class="icon-option" data-icon="💧">💧</div>
+                        <div class="icon-option" data-icon="🏃">🏃</div>
+                        <div class="icon-option" data-icon="🎨">🎨</div>
+                        <div class="icon-option" data-icon="🎵">🎵</div>
+                        <div class="icon-option" data-icon="✍️">✍️</div>
+                        <div class="icon-option" data-icon="🌱">🌱</div>
+                        <div class="icon-option" data-icon="💤">💤</div>
+                        <div class="icon-option" data-icon="🥗">🥗</div>
+                    </div>
+                    <div class="input-wrapper" style="margin-top: 15px;">
+                        <label class="input-label">Motivation</label>
+                        <input type="text" class="input-field" id="habitMotivation"
+                            placeholder="Why do you want this habit? 💡">
+                    </div>
+
+                    <div class="input-wrapper" style="margin-top: 15px;">
+                        <label class="input-label">Reminder Time</label>
+                        <input type="time" class="input-field" id="habitTime">
+                    </div>
+                </div>
+                <button type="submit" class="btn-add" id="addHabitBtn"><span>➕</span> Add Habit</button>
+                <p id="habitLimitHint" class="habit-limit-note" aria-live="polite"></p>
+            </form>
+        </section>
+        <aside class="right-assist-column" aria-label="Assistant Widgets">
+            <section class="smart-learning-card" id="smartLearningCard" aria-label="Smart Learning Assistant">
+                <div class="smart-learning-icon">🧠✨</div>
+                <h3>Wanna learn something new?</h3>
+                <p>Let Loopin build your learning roadmap and automatically create habits for you 🚀</p>
+                <button type="button" class="smart-learning-start" id="smartLearningStartBtn">Start Learning</button>
+            </section>
+
+            <section class="pet-profile-card" id="petProfileCard" aria-label="Your Buddy profile" role="button" tabindex="0">
+                <div class="pet-profile-title">
+                    <h4>🐣 Your Buddy</h4>
+                    <span class="pet-profile-level">Lv. <span id="petProfileLevel">1</span></span>
+                </div>
+                <div class="pet-profile-stage" id="petProfileStage">Stage: Egg</div>
+                <div class="pet-profile-avatar-wrap">
+                    <div class="pet-profile-avatar" id="petProfileAvatar" aria-live="polite"></div>
+                </div>
+                <div class="pet-profile-xp-row">
+                    <span>XP</span>
+                    <span id="petProfileXpText">0 / 100</span>
+                </div>
+                <div class="pet-profile-xp-track" aria-hidden="true">
+                    <div class="pet-profile-xp-fill" id="petProfileXpFill"></div>
+                </div>
+            </section>
+
+        </aside>
+        </div>
+        <section class="habits-section">
+            <div class="habits-header">
+                <h2 class="section-title" id="goCalendar" style="cursor: pointer;">
+                    <span class="section-icon">📅</span> Today's Habits
+                </h2>
+                <span class="habits-count" id="habitsCount">0 habits</span>
+            </div>
+            <div class="habits-grid" id="habitsGrid">
+                <div class="loading">
+                    <div class="loading-spinner">🔄</div>
+                    <p>Loading habits...</p>
+                </div>
+            </div>
+        </section>
+        <footer class="footer">
+            <p>Keepin' the streak with Loopin Team 🔥</p>
+        </footer>
+    </div>
+
+    <div id="premiumModalOverlay" class="premium-modal-overlay" aria-hidden="true">
+        <div class="premium-modal" role="dialog" aria-modal="true" aria-labelledby="premiumModalTitle" aria-describedby="premiumModalDesc">
+            <div class="premium-modal-inner">
+                <span class="premium-float f1">✨</span>
+                <span class="premium-float f2">💎</span>
+                <span class="premium-float f3">🌟</span>
+
+                <button type="button" class="premium-close" id="premiumModalClose" aria-label="Close premium modal">✕</button>
+
+                <h2 id="premiumModalTitle" class="premium-title">Upgrade to Premium</h2>
+                <p id="premiumModalDesc" class="premium-subtitle">Unlock smarter habit building with Loopin</p>
+
+                <div class="premium-price">Monthly plan: $1.99 / month</div>
+
+                <div class="premium-features">
+                    <h4>Premium users can additionally:</h4>
+                    <ul>
+                        <li>Input learning roadmaps</li>
+                        <li>Automatically generate reminder schedules</li>
+                        <li>Receive smarter habit analysis</li>
+                    </ul>
+                </div>
+
+                <button type="button" class="premium-cta" id="premiumStartBtn">Start Premium for $1.99/month</button>
+                <button type="button" class="premium-later" id="premiumLaterBtn">Maybe later</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="habitLimitModal" class="habit-limit-modal" aria-hidden="true">
+        <div class="habit-limit-modal-card" role="dialog" aria-modal="true" aria-labelledby="habitLimitTitle" aria-describedby="habitLimitMessage">
+            <h3 id="habitLimitTitle">Habit Limit Reached</h3>
+            <p id="habitLimitMessage">Free users can only create up to 3 habits. Upgrade to Premium for unlimited habits.</p>
+            <ul class="habit-limit-benefits">
+                <li>Unlimited habits</li>
+                <li>Smart reminders</li>
+                <li>Advanced analytics</li>
+            </ul>
+            <div class="habit-limit-actions">
+                <button type="button" id="habitLimitCloseBtn" class="habit-limit-close">Maybe later</button>
+                <button type="button" id="habitLimitUpgradeBtn" class="habit-limit-upgrade">Upgrade to Premium</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="smartLearningModal" class="smart-learning-modal" aria-hidden="true">
+        <div class="smart-learning-modal-card" role="dialog" aria-modal="true" aria-labelledby="smartLearningModalTitle">
+            <button type="button" class="smart-learning-close" id="smartLearningCloseBtn" aria-label="Close">✕</button>
+            <h2 id="smartLearningModalTitle" class="smart-learning-modal-title">✨ Smart Learning Assistant</h2>
+
+            <div class="sl-step" id="slStepInput">
+                <div class="sl-field">
+                    <label for="slGoalInput">What do you want to learn?</label>
+                    <input id="slGoalInput" class="sl-input" type="text" placeholder="Learn guitar">
+                </div>
+
+                <div class="sl-field">
+                    <label>Level</label>
+                    <div class="sl-radio-group">
+                        <label><input type="radio" name="slLevel" value="beginner" checked> Beginner</label>
+                        <label><input type="radio" name="slLevel" value="intermediate"> Intermediate</label>
+                        <label><input type="radio" name="slLevel" value="advanced"> Advanced</label>
+                    </div>
+                </div>
+
+                <div class="sl-field">
+                    <label for="slDailyTime">Daily time</label>
+                    <select id="slDailyTime" class="sl-select">
+                        <option value="30 minutes">30 minutes</option>
+                        <option value="45 minutes" selected>45 minutes</option>
+                        <option value="1 hour">1 hour</option>
+                        <option value="90 minutes">90 minutes</option>
+                    </select>
+                </div>
+
+                <div class="sl-field">
+                    <label for="slPreferredTime">Preferred time</label>
+                    <select id="slPreferredTime" class="sl-select">
+                        <option value="morning">Morning</option>
+                        <option value="afternoon">Afternoon</option>
+                        <option value="evening" selected>Evening</option>
+                    </select>
+                </div>
+
+                <button type="button" id="slGenerateBtn" class="sl-generate-btn">Generate Roadmap</button>
+            </div>
+
+            <div class="sl-step" id="slStepLoading">
+                <div class="sl-loading-box">Generating your roadmap... ⏳</div>
+            </div>
+
+            <div class="sl-step" id="slStepResult">
+                <div id="slRoadmapSummary"></div>
+                <div id="slRoadmapPhases"></div>
+                <div class="sl-result-actions">
+                    <button type="button" id="slCancelBtn" class="sl-cancel-btn">Cancel</button>
+                    <button type="button" id="slAddSelectedBtn" class="sl-add-btn">Add Selected Habits</button>
+                </div>
+            </div>
+
+            <div class="sl-step" id="slStepLock">
+                <div class="sl-phase">
+                    <h4>💎 Premium Feature</h4>
+                    <p>Unlock Smart Learning Assistant to automatically build your roadmap and create streak-ready habits.</p>
+                    <button type="button" id="slUpgradeBtn" class="sl-upgrade-btn">Upgrade Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/lib/premium-badge.js"></script>
+    <script src="/lib/premium-service.js"></script>
+    <script src="/lib/subscription-store.js"></script>
+    <script src="/lib/premium-modal.js"></script>
+    <script src="/lib/pet-buddy.js"></script>
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        let selectedIcon = '✨';
+        const colors = ['blue', 'pink', 'yellow', 'purple', 'green'];
+        const FREE_HABIT_LIMIT = 3;
+        const token = localStorage.getItem('loopin_token');
+        const user = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+        let habitLimitState = {
+            userType: user && user.isPremium === true ? 'PREMIUM_USER' : 'FREE_USER',
+            isPremium: user && user.isPremium === true,
+            habitCount: 0,
+            limit: user && user.isPremium === true ? null : FREE_HABIT_LIMIT,
+            canCreate: true,
+            remaining: user && user.isPremium === true ? null : FREE_HABIT_LIMIT
+        };
+        let hasShownLimitToast = false;
+        const learningAssistantState = {
+            isOpen: false,
+            step: 'input',
+            roadmap: null,
+            selectedHabits: {}
+        };
+        if (!token) { window.location.href = '/login'; }
+        document.getElementById('userName').textContent = user.username || 'User';
+
+        // Show badge only when user.isPremium is strictly true.
+        // This keeps behavior aligned with the requirement.
+        function getPremiumState(userData) {
+            return {
+                isPremium: !!userData && userData.isPremium === true,
+                isNonPremium: !!userData && userData.isPremium === false
+            };
+        }
+
+        function setPremiumBadgeVisibility(userData) {
+            const badge = document.getElementById('premiumBadge');
+            if (!badge) return;
+            if (window.PremiumBadgeUI && typeof window.PremiumBadgeUI.renderPremiumBadge === 'function') {
+                window.PremiumBadgeUI.renderPremiumBadge(badge, userData);
+                return;
+            }
+            const { isPremium } = getPremiumState(userData);
+            badge.style.display = isPremium ? 'inline-flex' : 'none';
+        }
+
+        function setPremiumCardVisibility(userData) {
+            const card = document.getElementById('premiumUpsellCard');
+            if (!card) return;
+            const { isNonPremium } = getPremiumState(userData);
+            card.style.display = isNonPremium ? 'flex' : 'none';
+            if (!isNonPremium && window.LoopinPremiumModal) window.LoopinPremiumModal.close();
+        }
+
+        function syncPremiumUI(userData) {
+            setPremiumBadgeVisibility(userData);   // show only for premium users
+            setPremiumCardVisibility(userData);    // show only for non-premium users
+            const badge = document.getElementById('premiumBadge');
+            if (badge) {
+                const { isPremium } = getPremiumState(userData);
+                const expiry = userData && userData.subscriptionEnd ? userData.subscriptionEnd : null;
+                badge.title = isPremium && expiry
+                    ? ('Your plan expires on ' + new Date(expiry).toLocaleDateString())
+                    : '';
+            }
+        }
+
+        function openPremiumModalFromUser(userData) {
+            if (!window.LoopinPremiumModal) return;
+            window.LoopinPremiumModal.open(userData, {
+                upgrade: function () {
+                    navigateToPremiumPayment('/home');
+                },
+                manage: function () {
+                    navigateToPremiumPayment('/home');
+                },
+                cancel: function () {
+                    alert('Please contact support to cancel your plan for now.');
+                }
+            });
+        }
+
+        function navigateToPremiumPayment(originPath) {
+            const returnTo = `${originPath}?openPremium=1`;
+            const target = `/premium-payment?returnTo=${encodeURIComponent(returnTo)}`;
+
+            document.body.classList.add('premium-route-leaving');
+            if (window.LoopinPremiumModal) window.LoopinPremiumModal.close();
+
+            setTimeout(() => {
+                window.location.href = target;
+            }, 220);
+        }
+
+        function maybeReopenPremiumModalFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('openPremium') !== '1') return;
+
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+
+            const latestUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            setTimeout(() => openPremiumModalFromUser(latestUser), 140);
+        }
+
+        // Apply once from current localStorage snapshot.
+    syncPremiumUI(user);
+    maybeReopenPremiumModalFromUrl();
+
+        // Premium interactions
+        const premiumCardEl = document.getElementById('premiumUpsellCard');
+        const premiumBadgeEl = document.getElementById('premiumBadge');
+
+        if (premiumCardEl) {
+            premiumCardEl.addEventListener('click', function (e) {
+                e.preventDefault();
+                const latestUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+                const { isNonPremium } = getPremiumState(latestUser);
+                if (!isNonPremium) return;
+                openPremiumModalFromUser(latestUser);
+            });
+        }
+
+        // Premium users can click the badge to see active plan details (no upsell)
+        if (premiumBadgeEl) {
+            premiumBadgeEl.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const latestUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+                const { isPremium } = getPremiumState(latestUser);
+                if (!isPremium) return;
+                openPremiumModalFromUser(latestUser);
+            });
+        }
+
+        // Refresh user profile from API so premium badge uses latest server-side isPremium state.
+        async function refreshCurrentUserProfile() {
+            try {
+                const rawUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+                const userId = rawUser._id || rawUser.id;
+                if (!userId) return;
+
+                const res = await fetch(`/api/users/profile?userId=${encodeURIComponent(userId)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (result && result.success && result.data) {
+                    const merged = {
+                        ...rawUser,
+                        ...result.data,
+                        // Preserve strict boolean state only when backend explicitly provides true/false
+                        isPremium: result.data.isPremium === true
+                            ? true
+                            : (result.data.isPremium === false ? false : rawUser.isPremium)
+                    };
+                    localStorage.setItem('loopin_user', JSON.stringify(merged));
+
+                    // Re-sync header/nav with fresh user payload
+                    syncUserUI();
+                }
+            } catch (err) {
+                console.warn('Could not refresh user profile on home page:', err);
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function openHabitLimitModal() {
+            const modal = document.getElementById('habitLimitModal');
+            if (!modal) return;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeHabitLimitModal() {
+            const modal = document.getElementById('habitLimitModal');
+            if (!modal) return;
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        function deriveClientLimitState(habitCount) {
+            const latestUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            const isPremium = latestUser && latestUser.isPremium === true;
+            const limit = isPremium ? null : FREE_HABIT_LIMIT;
+            return {
+                userType: isPremium ? 'PREMIUM_USER' : 'FREE_USER',
+                isPremium,
+                habitCount,
+                limit,
+                canCreate: limit === null ? true : habitCount < limit,
+                remaining: limit === null ? null : Math.max(0, limit - habitCount)
+            };
+        }
+
+        function applyHabitLimitUI(limitInfo, options = {}) {
+            const state = limitInfo || deriveClientLimitState(0);
+            habitLimitState = state;
+
+            const addHabitBtn = document.getElementById('addHabitBtn');
+            const habitLimitHint = document.getElementById('habitLimitHint');
+
+            if (!addHabitBtn || !habitLimitHint) return;
+
+            const isBlockedFreeUser = state.userType === 'FREE_USER' && state.canCreate === false;
+            addHabitBtn.disabled = isBlockedFreeUser;
+            addHabitBtn.title = isBlockedFreeUser
+                ? 'Free plan limit reached. Upgrade to Premium for unlimited habits.'
+                : 'Add a new habit';
+
+            if (isBlockedFreeUser) {
+                habitLimitHint.classList.add('error');
+                habitLimitHint.textContent = 'Habit limit reached (3/3). Upgrade to Premium for unlimited habits.';
+                if (options.showNotice && !hasShownLimitToast) {
+                    showToast('Habit Limit Reached: Upgrade to Premium for unlimited habits.', true);
+                    openHabitLimitModal();
+                    hasShownLimitToast = true;
+                }
+            } else if (state.userType === 'FREE_USER') {
+                habitLimitHint.classList.remove('error');
+                const remaining = typeof state.remaining === 'number' ? state.remaining : Math.max(0, FREE_HABIT_LIMIT - (state.habitCount || 0));
+                habitLimitHint.textContent = `Free plan: ${remaining} habit slot${remaining === 1 ? '' : 's'} left (${state.habitCount || 0}/${FREE_HABIT_LIMIT}).`;
+                hasShownLimitToast = false;
+            } else {
+                habitLimitHint.classList.remove('error');
+                habitLimitHint.textContent = 'Premium active: unlimited habits.';
+                hasShownLimitToast = false;
+            }
+        }
+
+        function updatePetProfileCard(petData) {
+            const levelEl = document.getElementById('petProfileLevel');
+            const stageEl = document.getElementById('petProfileStage');
+            const avatarEl = document.getElementById('petProfileAvatar');
+            const xpTextEl = document.getElementById('petProfileXpText');
+            const xpFillEl = document.getElementById('petProfileXpFill');
+
+            if (!levelEl || !stageEl || !avatarEl || !xpTextEl || !xpFillEl) return;
+
+            const level = Number(petData && petData.level) || 1;
+            const xp = Number(petData && petData.xp) || 0;
+            const isPetHidden = !!(petData && petData.isPetHidden);
+
+            levelEl.textContent = String(level);
+
+            const state = window.PetBuddy && typeof window.PetBuddy.getState === 'function'
+                ? window.PetBuddy.getState(level, xp)
+                : { stageLabel: 'Egg', xpNeeded: level * 100, xpPercent: 0 };
+
+            if (isPetHidden) {
+                stageEl.textContent = 'Stage: Resting';
+                avatarEl.innerHTML = '<span style="font-size:44px;line-height:1;display:block;">😴</span>';
+            } else {
+                stageEl.textContent = `Stage: ${state.stageLabel}`;
+                if (window.PetBuddy && typeof window.PetBuddy.apply === 'function') {
+                    window.PetBuddy.apply(avatarEl, level, xp, { size: 'widget' });
+                }
+            }
+
+            xpTextEl.textContent = `${xp} / ${state.xpNeeded}`;
+            xpFillEl.style.width = `${state.xpPercent}%`;
+        }
+
+        function navigateToCalendarPage() {
+            window.location.href = 'http://localhost:3001/calendar.html';
+        }
+
+        function isCurrentUserPremium() {
+            const latestUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+            return !!(latestUser && latestUser.isPremium === true);
+        }
+
+        function toggleSmartLearningModal(open) {
+            const modal = document.getElementById('smartLearningModal');
+            if (!modal) return;
+
+            learningAssistantState.isOpen = !!open;
+            modal.classList.toggle('open', !!open);
+            modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+
+        function setSmartLearningStep(step) {
+            learningAssistantState.step = step;
+            const steps = ['slStepInput', 'slStepLoading', 'slStepResult', 'slStepLock'];
+            steps.forEach((stepId) => {
+                const el = document.getElementById(stepId);
+                if (!el) return;
+                const shouldShow =
+                    (step === 'input' && stepId === 'slStepInput') ||
+                    (step === 'loading' && stepId === 'slStepLoading') ||
+                    (step === 'result' && stepId === 'slStepResult') ||
+                    (step === 'lock' && stepId === 'slStepLock');
+                el.classList.toggle('active', shouldShow);
+            });
+        }
+
+        function resetSmartLearningState() {
+            learningAssistantState.step = 'input';
+            learningAssistantState.roadmap = null;
+            learningAssistantState.selectedHabits = {};
+            setSmartLearningStep('input');
+        }
+
+        function getSelectedLevel() {
+            const selected = document.querySelector('input[name="slLevel"]:checked');
+            return selected ? selected.value : 'beginner';
+        }
+
+        function flattenRoadmapHabits(roadmap) {
+            if (!roadmap || !Array.isArray(roadmap.phases)) return [];
+            return roadmap.phases.flatMap((phase) =>
+                (phase.habits || []).map((habit) => ({
+                    ...habit,
+                    phase_id: phase.phase_id,
+                    phase_name: phase.phase_name
+                }))
+            );
+        }
+
+        function initializeSelectedHabits(roadmap) {
+            const selected = {};
+            flattenRoadmapHabits(roadmap).forEach((habit) => {
+                selected[habit.habit_id] = {
+                    ...habit,
+                    selected: true
+                };
+            });
+            learningAssistantState.selectedHabits = selected;
+        }
+
+        function renderRoadmapPreview() {
+            const summaryEl = document.getElementById('slRoadmapSummary');
+            const phasesEl = document.getElementById('slRoadmapPhases');
+            if (!summaryEl || !phasesEl) return;
+
+            const roadmap = learningAssistantState.roadmap;
+            if (!roadmap || !Array.isArray(roadmap.phases)) {
+                summaryEl.innerHTML = '';
+                phasesEl.innerHTML = '';
+                return;
+            }
+
+            summaryEl.innerHTML = `
+                <div class="sl-phase">
+                    <h4>🎯 Your Learning Plan</h4>
+                    <p>${roadmap.summary || ''}</p>
+                </div>
+            `;
+
+            phasesEl.innerHTML = roadmap.phases.map((phase) => {
+                const habitsHtml = (phase.habits || []).map((habit) => {
+                    const selected = learningAssistantState.selectedHabits[habit.habit_id];
+                    const isChecked = selected ? selected.selected !== false : true;
+                    const timeValue = selected ? selected.suggested_time : habit.suggested_time;
+                    const durationValue = selected ? selected.duration_minutes : habit.duration_minutes;
+
+                    return `
+                        <div class="sl-habit-row" data-habit-id="${habit.habit_id}">
+                            <div class="sl-habit-main">
+                                <input type="checkbox" class="sl-habit-checkbox" data-habit-id="${habit.habit_id}" ${isChecked ? 'checked' : ''}>
+                                <span>${habit.name}</span>
+                            </div>
+                            <div class="sl-habit-desc">${habit.description}</div>
+                            <div class="sl-habit-meta">
+                                <div>
+                                    <label>Time</label>
+                                    <input type="time" class="sl-habit-time" data-habit-id="${habit.habit_id}" value="${timeValue}">
+                                </div>
+                                <div>
+                                    <label>Duration (min)</label>
+                                    <input type="number" min="5" max="120" step="5" class="sl-habit-duration" data-habit-id="${habit.habit_id}" value="${durationValue}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="sl-phase">
+                        <h4>Phase ${phase.phase_id}: ${phase.phase_name}</h4>
+                        <p>${phase.description}</p>
+                        ${habitsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function syncSelectedHabitsFromPreview() {
+            const checkboxes = document.querySelectorAll('.sl-habit-checkbox');
+            checkboxes.forEach((checkbox) => {
+                const habitId = checkbox.dataset.habitId;
+                const selectedHabit = learningAssistantState.selectedHabits[habitId];
+                if (!selectedHabit) return;
+
+                const timeInput = document.querySelector(`.sl-habit-time[data-habit-id="${habitId}"]`);
+                const durationInput = document.querySelector(`.sl-habit-duration[data-habit-id="${habitId}"]`);
+
+                selectedHabit.selected = checkbox.checked;
+                selectedHabit.suggested_time = (timeInput && timeInput.value) ? timeInput.value : selectedHabit.suggested_time;
+
+                const parsedDuration = durationInput ? parseInt(durationInput.value, 10) : selectedHabit.duration_minutes;
+                if (!Number.isNaN(parsedDuration) && parsedDuration >= 5) {
+                    selectedHabit.duration_minutes = parsedDuration;
+                }
+            });
+        }
+
+        async function requestLearningRoadmap() {
+            const goalInput = document.getElementById('slGoalInput');
+            const dailyTimeInput = document.getElementById('slDailyTime');
+            const preferredTimeInput = document.getElementById('slPreferredTime');
+
+            const goal = goalInput ? goalInput.value.trim() : '';
+            if (!goal) {
+                showToast('Please enter what you want to learn.', true);
+                return;
+            }
+
+            setSmartLearningStep('loading');
+
+            const payload = {
+                goal,
+                level: getSelectedLevel(),
+                available_time_per_day: dailyTimeInput ? dailyTimeInput.value : '45 minutes',
+                preferred_time: preferredTimeInput ? preferredTimeInput.value : 'evening'
+            };
+
+            try {
+                const result = await apiRequest('/learning-roadmap', 'POST', payload);
+
+                if (result && result._httpStatus === 403 && result.code === 'PREMIUM_REQUIRED') {
+                    setSmartLearningStep('lock');
+                    return;
+                }
+
+                if (!result || !Array.isArray(result.phases)) {
+                    showToast((result && result.message) || 'Could not generate roadmap.', true);
+                    setSmartLearningStep('input');
+                    return;
+                }
+
+                learningAssistantState.roadmap = result;
+                initializeSelectedHabits(result);
+                renderRoadmapPreview();
+                setSmartLearningStep('result');
+            } catch (error) {
+                console.error('Roadmap generation failed:', error);
+                showToast('Could not generate roadmap.', true);
+                setSmartLearningStep('input');
+            }
+        }
+
+        function getIconByDifficulty(difficulty) {
+            if (difficulty === 'hard') return '🔥';
+            if (difficulty === 'medium') return '💪';
+            return '✨';
+        }
+
+        async function addSelectedLearningHabits() {
+            syncSelectedHabitsFromPreview();
+
+            const selectedHabits = Object.values(learningAssistantState.selectedHabits).filter((habit) => habit.selected);
+            if (selectedHabits.length === 0) {
+                showToast('Select at least one habit to add.', true);
+                return;
+            }
+
+            let createdCount = 0;
+
+            for (const habit of selectedHabits) {
+                const habitPayload = {
+                    name: habit.name,
+                    goal: { unit: 'minutes', value: habit.duration_minutes },
+                    icon: getIconByDifficulty(habit.difficulty),
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    motivation: habit.description,
+                    reminderTime: habit.suggested_time
+                };
+
+                const createResult = await apiRequest('/habits', 'POST', habitPayload);
+
+                if (createResult && createResult.success) {
+                    createdCount += 1;
+                    continue;
+                }
+
+                if (createResult && createResult.code === 'HABIT_LIMIT_REACHED') {
+                    showToast('Habit limit reached while adding selected habits.', true);
+                    break;
+                }
+            }
+
+            if (createdCount > 0) {
+                showToast(`Added ${createdCount} habit${createdCount > 1 ? 's' : ''} from roadmap.`);
+                toggleSmartLearningModal(false);
+                resetSmartLearningState();
+                await loadHabits();
+                return;
+            }
+
+            showToast('No habits were added. Try adjusting your selections.', true);
+        }
+
+        async function apiRequest(endpoint, method = 'GET', body = null) {
+            const options = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } };
+            if (body) options.body = JSON.stringify(body);
+            const response = await fetch(API_URL + endpoint, options);
+            const data = await response.json();
+            if (response.status === 401) { localStorage.removeItem('loopin_token'); localStorage.removeItem('loopin_user'); window.location.href = '/login'; return; }
+            if (data && typeof data === 'object') {
+                data._httpStatus = response.status;
+            }
+            return data;
+        }
+
+        function renderHabits(habits) {
+            const grid = document.getElementById('habitsGrid');
+            const countEl = document.getElementById('habitsCount');
+            if (habits.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div><h3 class="empty-title">No habits yet!</h3><p class="empty-text">Add your first habit above to get started! ✨</p></div>';
+                countEl.textContent = '0 habits';
+                return;
+            }
+            countEl.textContent = habits.length + ' habit' + (habits.length > 1 ? 's' : '');
+            grid.innerHTML = habits.map(function (habit, index) {
+                var colorClass = colors[index % colors.length];
+                var isChecked = habit.isCheckedInToday;
+                return '<div class="habit-card color-' + colorClass + '" data-id="' + habit._id + '"><div class="habit-info"><div class="habit-icon">' + (habit.icon || '✨') + '</div><div class="habit-details"><h3>' + habit.name + '</h3><p class="habit-goal">Goal: ' + habit.goal.value + ' ' + habit.goal.unit + '</p></div></div><div class="habit-stats"><div class="streak"><span class="streak-fire">🔥</span><div><div class="streak-count">' + habit.streak + '</div><div class="streak-label">day streak</div></div></div><div class="habit-actions"><button class="btn-checkin ' + (isChecked ? 'checked' : '') + '" onclick="checkinHabit(\'' + habit._id + '\')" title="' + (isChecked ? 'Already checked in!' : 'Check in!') + '">✓</button><button class="btn-delete" onclick="deleteHabit(\'' + habit._id + '\')" title="Delete">🗑️</button></div></div></div>';
+            }).join('');
+
+            // Trigger flame burst each time habits render (page visit / reload)
+            triggerStreakFlameBurst();
+        }
+
+        function triggerStreakFlameBurst() {
+            var streakEls = document.querySelectorAll('.streak');
+            if (!streakEls || streakEls.length === 0) return;
+            streakEls.forEach(function (el) {
+                el.classList.remove('flame-burst');
+                void el.offsetWidth; // restart animation reliably
+                el.classList.add('flame-burst');
+            });
+            setTimeout(function () {
+                streakEls.forEach(function (el) { el.classList.remove('flame-burst'); });
+            }, 3600);
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalHabits').textContent = stats.totalHabits;
+            document.getElementById('completedToday').textContent = stats.checkedInToday;
+            document.getElementById('longestStreak').textContent = stats.longestStreak + ' 🔥';
+            var title = document.getElementById('motivationTitle');
+            var text = document.getElementById('motivationText');
+            if (stats.completionRate === 100 && stats.totalHabits > 0) { title.textContent = "🎉 Perfect day!"; text.textContent = "You've completed all habits! Amazing! 🌟"; }
+            else if (stats.completionRate >= 50) { title.textContent = "You're doing great!"; text.textContent = "Keep going — you're more than halfway! 💪"; }
+            else if (stats.checkedInToday > 0) { title.textContent = "Good start!"; text.textContent = "You've got this — keep checking in! ✨"; }
+            else { title.textContent = "Ready to start?"; text.textContent = "Check in to your first habit today! 🚀"; }
+        }
+
+        async function loadHabits() {
+            try {
+                var habitsRes = await apiRequest('/habits');
+                var statsRes = await apiRequest('/habits/stats');
+                if (habitsRes && habitsRes.success) {
+                    const habits = habitsRes.data && Array.isArray(habitsRes.data.habits) ? habitsRes.data.habits : [];
+                    renderHabits(habits);
+
+                    const limitFromApi = habitsRes.data && habitsRes.data.limits ? habitsRes.data.limits : deriveClientLimitState(habits.length);
+                    applyHabitLimitUI(limitFromApi, { showNotice: true });
+                }
+                if (statsRes && statsRes.success) {
+                    updateStats(statsRes.data.stats);
+                    if (statsRes.data && statsRes.data.user) {
+                        updatePetProfileCard(statsRes.data.user);
+                    }
+                }
+            } catch (error) { console.error('Error:', error); showToast('Error loading habits', true); }
+        }
+
+        document.getElementById('addHabitForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            var name = document.getElementById('habitName').value;
+            var goalValue = parseInt(document.getElementById('habitGoalValue').value) || 1;
+            var goalUnit = document.getElementById('habitGoalUnit').value || 'times';
+            var motivation = document.getElementById('habitMotivation').value;
+            var time = document.getElementById('habitTime').value;
+
+            var btn = document.getElementById('addHabitBtn');
+
+            if (habitLimitState && habitLimitState.userType === 'FREE_USER' && habitLimitState.canCreate === false) {
+                showToast('Habit Limit Reached', true);
+                openHabitLimitModal();
+                return;
+            }
+
+            btn.disabled = true;
+
+            try {
+                var res = await apiRequest('/habits', 'POST', {
+                    name: name,
+                    goal: { unit: goalUnit, value: goalValue },
+                    icon: selectedIcon,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    motivation: motivation,
+                    reminderTime: time
+                });
+
+                if (res && res.success) {
+                    showToast(res.message);
+                    document.getElementById('habitName').value = '';
+                    document.getElementById('habitGoalValue').value = '';
+                    document.getElementById('habitMotivation').value = '';
+                    document.getElementById('habitTime').value = '';
+                    loadHabits();
+                } else {
+                    if (res && res._httpStatus === 403 && res.code === 'HABIT_LIMIT_REACHED') {
+                        if (res.data && res.data.limits) {
+                            applyHabitLimitUI(res.data.limits, { showNotice: true });
+                        }
+                        showToast('Habit Limit Reached', true);
+                        openHabitLimitModal();
+                    }
+                    showToast(res ? res.message : 'Error', true);
+                }
+            } catch (error) {
+                showToast('Error adding habit', true);
+            }
+
+            btn.disabled = false;
+        });
+        async function checkinHabit(habitId) {
+            try {
+                var res = await apiRequest('/habits/' + habitId + '/checkin', 'POST');
+
+                if (res && res.success) {
+                    showToast(res.message);
+
+
+                    if (typeof updateXPUI === 'function') {
+                        updateXPUI(res.xp, res.level);
+                    }
+
+
+                    if (res.leveledUp && typeof triggerLevelUpEffect === 'function') {
+                        triggerLevelUpEffect();
+                    }
+
+
+                    const userData = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+                    userData.xp = res.xp;
+                    userData.level = res.level;
+                    localStorage.setItem('loopin_user', JSON.stringify(userData));
+
+                    loadHabits();
+                } else {
+                    showToast(res ? res.message : 'Error', true);
+                }
+            } catch (error) {
+                showToast('Error checking in', true);
+            }
+        }
+
+        document.getElementById('iconPicker').addEventListener('click', function (e) {
+            if (e.target.classList.contains('icon-option')) {
+                document.querySelectorAll('.icon-option').forEach(function (el) { el.classList.remove('selected'); });
+                e.target.classList.add('selected');
+                selectedIcon = e.target.dataset.icon;
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async function () {
+            try {
+                await fetch(`${API_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+            } catch (e) {
+                console.warn('Logout API call failed, continuing local cleanup.', e);
+            }
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('loopin_token');
+            localStorage.removeItem('loopin_user');
+            localStorage.removeItem('last_rank');
+            sessionStorage.clear();
+            window.location.replace('/');
+        });
+
+        const smartLearningStartBtn = document.getElementById('smartLearningStartBtn');
+    const petProfileCard = document.getElementById('petProfileCard');
+        const smartLearningModal = document.getElementById('smartLearningModal');
+        const smartLearningCloseBtn = document.getElementById('smartLearningCloseBtn');
+        const slGenerateBtn = document.getElementById('slGenerateBtn');
+        const slAddSelectedBtn = document.getElementById('slAddSelectedBtn');
+        const slCancelBtn = document.getElementById('slCancelBtn');
+        const slUpgradeBtn = document.getElementById('slUpgradeBtn');
+
+        if (smartLearningStartBtn) {
+            smartLearningStartBtn.addEventListener('click', function () {
+                toggleSmartLearningModal(true);
+                if (isCurrentUserPremium()) {
+                    setSmartLearningStep('input');
+                    return;
+                }
+                setSmartLearningStep('lock');
+            });
+        }
+
+        if (petProfileCard) {
+            petProfileCard.addEventListener('click', navigateToCalendarPage);
+            petProfileCard.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    navigateToCalendarPage();
+                }
+            });
+        }
+
+        if (smartLearningCloseBtn) {
+            smartLearningCloseBtn.addEventListener('click', function () {
+                toggleSmartLearningModal(false);
+                resetSmartLearningState();
+            });
+        }
+
+        if (smartLearningModal) {
+            smartLearningModal.addEventListener('click', function (event) {
+                if (event.target === smartLearningModal) {
+                    toggleSmartLearningModal(false);
+                    resetSmartLearningState();
+                }
+            });
+        }
+
+        if (slGenerateBtn) {
+            slGenerateBtn.addEventListener('click', requestLearningRoadmap);
+        }
+
+        if (slAddSelectedBtn) {
+            slAddSelectedBtn.addEventListener('click', addSelectedLearningHabits);
+        }
+
+        if (slCancelBtn) {
+            slCancelBtn.addEventListener('click', function () {
+                toggleSmartLearningModal(false);
+                resetSmartLearningState();
+            });
+        }
+
+        if (slUpgradeBtn) {
+            slUpgradeBtn.addEventListener('click', function () {
+                toggleSmartLearningModal(false);
+                navigateToPremiumPayment('/home');
+            });
+        }
+
+        if (window.PetBuddy && typeof window.PetBuddy.ensureStyles === 'function') {
+            window.PetBuddy.ensureStyles();
+        }
+
+        setSmartLearningStep('input');
+        updatePetProfileCard({
+            level: user.level || 1,
+            xp: user.xp || 0,
+            isPetHidden: !!user.isPetHidden
+        });
+        loadHabits();
+
+        const habitLimitUpgradeBtn = document.getElementById('habitLimitUpgradeBtn');
+        const habitLimitCloseBtn = document.getElementById('habitLimitCloseBtn');
+        const habitLimitModal = document.getElementById('habitLimitModal');
+
+        if (habitLimitUpgradeBtn) {
+            habitLimitUpgradeBtn.addEventListener('click', function () {
+                closeHabitLimitModal();
+                navigateToPremiumPayment('/home');
+            });
+        }
+
+        if (habitLimitCloseBtn) {
+            habitLimitCloseBtn.addEventListener('click', function () {
+                closeHabitLimitModal();
+            });
+        }
+
+        if (habitLimitModal) {
+            habitLimitModal.addEventListener('click', function (e) {
+                if (e.target === habitLimitModal) {
+                    closeHabitLimitModal();
+                }
+            });
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log("Service Worker registered:", reg))
+                .catch(err => console.error("Service Worker registration failed:", err));
+        }
+
+        async function getNotificationPermission({ promptUser = false } = {}) {
+            if (!('Notification' in window)) {
+                return { granted: false, state: 'unsupported' };
+            }
+
+            // Browser-level blocked state (user denied before or browser auto-blocked).
+            if (Notification.permission === 'denied') {
+                return { granted: false, state: 'denied' };
+            }
+
+            // Already granted.
+            if (Notification.permission === 'granted') {
+                return { granted: true, state: 'granted' };
+            }
+
+            // 'default': ask only when explicitly requested by user interaction.
+            if (!promptUser) {
+                return { granted: false, state: 'default' };
+            }
+
+            try {
+                const permission = await Notification.requestPermission();
+                return { granted: permission === 'granted', state: permission };
+            } catch (error) {
+                console.warn('Notification permission request failed:', error);
+                return { granted: false, state: 'error' };
+            }
+        }
+        async function deleteHabit(habitId) {
+            if (!confirm('Are you sure you want to delete this habit?')) return;
+            try {
+                var res = await apiRequest('/habits/' + habitId, 'DELETE');
+                if (res && res.success) { showToast('Habit deleted'); loadHabits(); } else { showToast(res ? res.message : 'Error', true); }
+            } catch (error) { showToast('Error deleting habit', true); }
+        }
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data.type === 'RESET_STREAK') {
+                resetStreakOnUI(event.data.habitId);
+            }
+        });
+
+        function resetStreakOnUI(habitId) {
+            const streakEl = document.querySelector(`.habit-card[data-id="${habitId}"] .streak-count`);
+            if (streakEl) {
+                streakEl.textContent = "0";
+            }
+        }
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+        async function registerPush({ promptPermission = false } = {}) {
+            try {
+                if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                    console.info('Push API not supported in this environment.');
+                    return { ok: false, reason: 'unsupported' };
+                }
+
+                const permission = await getNotificationPermission({ promptUser: promptPermission });
+                if (!permission.granted) {
+                    console.info(`Skip push registration. Notification permission state: ${permission.state}`);
+                    return { ok: false, reason: permission.state };
+                }
+
+                const storedUser = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+                const userId = storedUser._id || storedUser.id;
+                const authToken = localStorage.getItem('loopin_token');
+
+                if (!userId || !authToken) {
+                    console.warn('Missing user session. Skip push registration.');
+                    return { ok: false, reason: 'missing-session' };
+                }
+
+                const registration = await navigator.serviceWorker.ready;
+                const VAPID_PUBLIC_KEY = 'BIL7clGIC1HrW8wBzcaYDxagXXhl_xbfHuAs2vXMApefvK85iSaenZdjcncnCKUyXoFAPciM9vuXp6gnh3DPGvI';
+
+                // Reuse existing subscription when available to avoid churn.
+                let subscription = await registration.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                    });
+                    console.log('✅ New Push Subscription successful:', subscription);
+                }
+
+                const saveRes = await fetch('/api/users/save-subscription', {
+                    method: 'POST',
+                    body: JSON.stringify({ userId, subscription }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!saveRes.ok) {
+                    console.warn('Push subscription exists but failed to sync with server.');
+                    return { ok: false, reason: 'save-failed' };
+                }
+
+                return { ok: true };
+            } catch (err) {
+                // Critical requirement: push setup must never break signup/login/home flow.
+                if (err && err.name === 'NotAllowedError') {
+                    console.info('Push registration skipped: notification permission denied/blocked.');
+                    return { ok: false, reason: 'not-allowed' };
+                }
+
+                console.warn('Push registration skipped due to non-fatal error:', err);
+                return { ok: false, reason: 'error' };
+            }
+        }
+
+        // Optional hook for a user-triggered CTA button (e.g., in Settings):
+        // document.getElementById('enableNotificationsBtn')?.addEventListener('click', () => {
+        //     registerPush({ promptPermission: true });
+        // });
+        async function updateEmail(userId, email) {
+            try {
+                const res = await fetch('/api/users/update-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, email })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Email updated successfully');
+                } else {
+                    showToast(data.message, true);
+                }
+            } catch (err) {
+                showToast('Error updating email', true);
+            }
+        }
+        function renderNavAvatar(el, avatar) {
+            if (!el) return;
+            var a = avatar == null ? '' : String(avatar).trim();
+            if (!a) { el.textContent = '🐱'; return; }
+            if (/^https?:\/\//i.test(a) || a.indexOf('/uploads/') === 0) {
+                var safe = a.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                el.innerHTML = '<img src="' + safe + '" alt="">';
+            } else {
+                el.textContent = a;
+            }
+        }
+
+        function updateSidebarUI() {
+
+            const userJson = localStorage.getItem('loopin_user');
+
+
+            if (userJson) {
+                const userData = JSON.parse(userJson);
+
+                const nameElement = document.getElementById('userNameDisplay');
+                if (nameElement && userData.username) {
+                    nameElement.textContent = `Hi, ${userData.username}!`;
+                }
+
+                const avatarElement = document.getElementById('userAvatar');
+                renderNavAvatar(avatarElement, userData.avatar);
+
+                const emailElement = document.getElementById('userEmailDisplay');
+                if (emailElement && userData.email) {
+                    emailElement.textContent = userData.email;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateSidebarUI);
+        function syncUserUI() {
+            const userData = JSON.parse(localStorage.getItem('loopin_user') || '{}');
+
+            const nameEl = document.getElementById('userName');
+            const avatarEl = document.getElementById('homeUserAvatar');
+            const greetingEl = document.getElementById('homeGreeting');
+
+            // Keep premium UI in sync with the latest user object.
+            syncPremiumUI(userData);
+
+            if (userData.username) {
+
+                if (nameEl) nameEl.textContent = userData.username;
+                renderNavAvatar(avatarEl, userData.avatar);
+
+
+                if (greetingEl) {
+                    const hour = new Date().getHours();
+                    if (hour < 12) greetingEl.textContent = `Good morning, ${userData.username}! 🌅`;
+                    else if (hour < 18) greetingEl.textContent = `Good afternoon, ${userData.username}! ☀️`;
+                    else greetingEl.textContent = `Good evening, ${userData.username}! 🌙`;
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', syncUserUI);
+        // Also run it immediately in case DOM is already ready and to ensure UI sync without waiting.
+        try { syncUserUI(); } catch (e) { /* ignore if elements not yet present */ }
+    // Ensure premium state is current after initial paint.
+    refreshCurrentUserProfile();
+
+        window.onpageshow = function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                syncUserUI();
+            }
+        };
+
+    // Do NOT auto-prompt for permission on page load.
+    // Attempt silent setup only when permission is already granted.
+    registerPush({ promptPermission: false });
+        loadHabits();
+
+        document.getElementById('goCalendar').addEventListener('click', function () {
+            window.location.href = 'calendar.html';
+        });
+        async function handleCheckin(habitId) {
+            try {
+                const res = await fetch(`${API_URL}/habits/${habitId}/checkin`, {
+                    method: 'POST',
+                    headers: {
+                        // If you use a JWT token in localStorage, add the line below
+                        // 'Authorization': `Bearer ${localStorage.getItem('loopin_token')}`
+                    }
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    // 1. Immediately update the XP bar on the UI (if Dashboard is on the same page)
+                    if (typeof updateXPUI === "function") {
+                        updateXPUI(result.xp, result.level);
+                    }
+
+                    // 2. If there is a Level Up effect
+                    if (result.leveledUp) {
+                        triggerLevelUpEffect();
+                    }
+
+                    // 3. Reload the habit list to show the completed status (green checkmark)
+                    loadHabits();
+
+                    // 4. If you have a function to update the count of completed habits (e.g., 1/5 habits)
+                    // syncUserUI(); 
+                } else {
+                    alert(result.message || "Check-in failed");
+                }
+            } catch (err) {
+                console.error("Error during check-in:", err);
+            }
+        }
+        async function checkForPokes() {
+            try {
+                const res = await fetch('/api/friendships/check-pokes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const result = await res.json();
+
+                if (result.success && result.pokes.length > 0) {
+                    result.pokes.forEach(poke => {
+                        showToast(`${poke.from} poked you! 👉 Keep your streak alive!`);
+                    });
+                }
+            } catch (err) {
+                console.error("Poke check failed", err);
+            }
+        }
+
+        // Run this when the page loads
+        document.addEventListener('DOMContentLoaded', checkForPokes);
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerText = message;
+                toast.className = 'toast show' + (isError ? ' error' : '');
+                setTimeout(() => toast.classList.remove('show'), 5000);
+            }
+        }
+
+        function triggerWelcomeFire() {
+            const overlay = document.getElementById('welcomeFireOverlay');
+            if (!overlay) return;
+
+            overlay.classList.add('fire-active');
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    colors: ['#ff4500', '#ff8c00']
+                });
+            }
+
+            setTimeout(() => {
+                overlay.classList.remove('fire-active');
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            triggerWelcomeFire();
+        });
+    </script>
+    <div id="toast" class="toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+
+</html>
